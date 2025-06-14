@@ -1,0 +1,8 @@
+{
+  "name": "where-is-waldo",
+  "private": true,
+  "workspaces": [
+    "backend",
+    "frontend"
+  ]
+}
