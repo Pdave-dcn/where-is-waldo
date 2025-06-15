@@ -1,11 +1,19 @@
 import { Button } from "./ui/button";
 import { RotateCcw, HelpCircle, Users } from "lucide-react";
-const Footer = () => {
+
+interface FooterProps {
+  resetGame: () => void;
+}
+const Footer = ({ resetGame }: FooterProps) => {
   return (
     <footer className="bg-background py-8">
       <div className="container mx-auto px-4">
         <div className="flex flex-wrap justify-center space-x-8 space-y-4 md:space-y-0">
-          <Button variant={"ghost"} className="flex items-center space-x-2">
+          <Button
+            onClick={resetGame}
+            variant={"ghost"}
+            className="flex items-center space-x-2"
+          >
             <RotateCcw className="w-5 h-5" />
             <span>Restart Game</span>
           </Button>
