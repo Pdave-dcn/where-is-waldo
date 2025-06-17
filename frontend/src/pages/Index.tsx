@@ -4,6 +4,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { useRef, useState } from "react";
 import Timer from "@/components/Timer";
+import GameImage from "@/components/GameImage";
 
 interface TimerRef {
   reset: () => void;
@@ -11,11 +12,26 @@ interface TimerRef {
 
 const Index = () => {
   const [gameStarted, setGameStarted] = useState(false);
+  const [boxPosition, setBoxPosition] = useState<{
+    x: number;
+    y: number;
+  } | null>(null);
   const timerRef = useRef<TimerRef>(null);
 
   const resetGame = () => {
     setGameStarted(false);
     timerRef.current?.reset();
+    setBoxPosition(null);
+  };
+
+  const handleImageClick = (x: number, y: number) => {
+    if (!gameStarted) return;
+
+    setBoxPosition({ x, y });
+  };
+
+  const handleTargetBoxClose = () => {
+    setBoxPosition(null);
   };
 
   return (
@@ -24,30 +40,35 @@ const Index = () => {
       <main className="flex flex-col items-center gap-8 px-5">
         <Timer gameStarted={gameStarted} ref={timerRef} />
 
-        <Card className="flex flex-col justify-center items-center w-full max-w-5xl mx-auto">
+        <div className="flex flex-col justify-center items-center w-full mx-auto">
           {gameStarted ? (
-            <CardContent>
-              <img src="img-1.jpg" alt="Mock image" />
-            </CardContent>
+            <GameImage
+              onImageClick={handleImageClick}
+              gameStarted={gameStarted}
+              boxPosition={boxPosition}
+              onBoxClose={handleTargetBoxClose}
+            />
           ) : (
-            <CardContent className="text-center py-10">
-              <div className="mb-5">
-                <h1 className="text-xl sm:text-3xl font-medium mb-2">
-                  Ready to Find Waldo?
-                </h1>
-                <p className="text-muted-foreground">
-                  Click on Waldo when you spot him in the crowd!
-                </p>
-              </div>
-              <Button
-                onClick={() => setGameStarted(true)}
-                className="self-center"
-              >
-                Start game
-              </Button>
-            </CardContent>
+            <Card className="w-full max-w-5xl">
+              <CardContent className="text-center py-10">
+                <div className="mb-5">
+                  <h1 className="text-xl sm:text-3xl font-medium mb-2">
+                    Ready to Find Waldo?
+                  </h1>
+                  <p className="text-muted-foreground">
+                    Click on Waldo when you spot him in the crowd!
+                  </p>
+                </div>
+                <Button
+                  onClick={() => setGameStarted(true)}
+                  className="self-center"
+                >
+                  Start game
+                </Button>
+              </CardContent>
+            </Card>
           )}
-        </Card>
+        </div>
       </main>
       <Footer resetGame={resetGame} />
     </div>
