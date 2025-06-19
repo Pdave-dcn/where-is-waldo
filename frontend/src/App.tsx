@@ -1,4 +1,4 @@
-import Index from "./pages";
+import Index from "./pages/Index";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import NotFound from "./pages/NotFound";
 

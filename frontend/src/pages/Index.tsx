@@ -16,22 +16,26 @@ const Index = () => {
     x: number;
     y: number;
   } | null>(null);
+  const [showDropdown, setShowDropdown] = useState(false);
   const timerRef = useRef<TimerRef>(null);
 
   const resetGame = () => {
     setGameStarted(false);
     timerRef.current?.reset();
     setBoxPosition(null);
+    setShowDropdown(false);
   };
 
   const handleImageClick = (x: number, y: number) => {
     if (!gameStarted) return;
 
     setBoxPosition({ x, y });
+    setShowDropdown(true);
   };
 
   const handleTargetBoxClose = () => {
     setBoxPosition(null);
+    setShowDropdown(false);
   };
 
   return (
@@ -47,6 +51,7 @@ const Index = () => {
               gameStarted={gameStarted}
               boxPosition={boxPosition}
               onBoxClose={handleTargetBoxClose}
+              showDropdown={showDropdown}
             />
           ) : (
             <Card className="w-full max-w-5xl">

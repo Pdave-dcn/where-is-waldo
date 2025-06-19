@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import CharacterDropdown from "./CharacterDropdown";
 
 interface TargetBoxProps {
   position: { x: number; y: number };
@@ -28,6 +29,11 @@ const TargetBox = ({ position, onClose }: TargetBoxProps) => {
     };
   }, [onClose]);
 
+  const onCharacterClick = (character: string) => {
+    console.log("Selected character:", character);
+    onClose();
+  };
+
   return (
     <div
       ref={targetRef}
@@ -43,6 +49,10 @@ const TargetBox = ({ position, onClose }: TargetBoxProps) => {
       <div className="relative">
         <div className="w-16 h-16 border-4 animate-pulse" />
         <div className="absolute inset-0 w-16 h-16 border-2" />
+      </div>
+
+      <div className="absolute top-20 left-1/2 transform -translate-x-1/2">
+        <CharacterDropdown onCharacterClick={onCharacterClick} />
       </div>
     </div>
   );

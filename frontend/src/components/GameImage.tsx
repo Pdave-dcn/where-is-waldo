@@ -11,6 +11,7 @@ interface GameImageProps {
     y: number;
   } | null;
   onBoxClose: () => void;
+  showDropdown: boolean;
 }
 
 const GameImage = ({
@@ -18,6 +19,7 @@ const GameImage = ({
   gameStarted,
   boxPosition,
   onBoxClose,
+  showDropdown,
 }: GameImageProps) => {
   const imageRef = useRef<HTMLImageElement>(null);
 
@@ -50,7 +52,8 @@ const GameImage = ({
             </p>
           </div>
         </div>
-        {boxPosition && (
+
+        {boxPosition && showDropdown && (
           <TargetBox position={boxPosition} onClose={onBoxClose} />
         )}
       </CardContent>
