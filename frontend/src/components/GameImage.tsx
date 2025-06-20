@@ -27,8 +27,11 @@ const GameImage = ({
     if (!gameStarted || !imageRef.current) return;
 
     const imageRect = imageRef.current.getBoundingClientRect();
-    const x = ((event.clientX - imageRect.left) / imageRect.width) * 100;
-    const y = ((event.clientY - imageRect.top) / imageRect.height) * 100;
+
+    const x = event.clientX - imageRect.left;
+    const y = event.clientY - imageRect.top;
+
+    //console.log(x, y);
 
     onImageClick(x, y);
   };

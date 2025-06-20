@@ -9,6 +9,8 @@ interface TargetBoxProps {
 const TargetBox = ({ position, onClose }: TargetBoxProps) => {
   const [isVisible, setIsVisible] = useState(false);
   const targetRef = useRef<HTMLDivElement>(null);
+  const waldoPosition = { x: 166, y: 120 };
+  const tolerance = 10;
 
   useEffect(() => {
     setIsVisible(true);
@@ -30,7 +32,26 @@ const TargetBox = ({ position, onClose }: TargetBoxProps) => {
   }, [onClose]);
 
   const onCharacterClick = (character: string) => {
-    console.log("Selected character:", character);
+    const isWaldo = character === "Waldo";
+
+    const isCorrectPosition =
+      Math.abs(position.x - waldoPosition.x) <= tolerance &&
+      Math.abs(position.y - waldoPosition.y) <= tolerance;
+
+    const result = {
+      x: Math.abs(position.x - waldoPosition.x),
+      y: Math.abs(position.y - waldoPosition.y),
+    };
+
+    console.log(result);
+
+    if (isWaldo && isCorrectPosition) {
+      console.log("🎉 You found Waldo! Amazing detective work!");
+    } else if (isWaldo && !isCorrectPosition) {
+      console.log("🔍 That's not where Waldo is hiding. Keep looking!");
+    } else {
+      console.log(`❌ That's not ${character}. Try finding Waldo!`);
+    }
     onClose();
   };
 
@@ -41,9 +62,9 @@ const TargetBox = ({ position, onClose }: TargetBoxProps) => {
         isVisible ? "opacity-100 scale-100" : "opacity-0 scale-95"
       }`}
       style={{
-        left: `${position.x}%`,
-        top: `${position.y}%`,
-        transform: "translate(-50%, -50%)",
+        left: `${position.x}px`,
+        top: `${position.y}px`,
+        transform: "translate(-25%, -50%)",
       }}
     >
       <div className="relative">
