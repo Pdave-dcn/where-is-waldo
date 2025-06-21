@@ -1,15 +1,17 @@
 import { useEffect, useRef, useState } from "react";
 import CharacterDropdown from "./CharacterDropdown";
+import { toast } from "sonner";
 
 interface TargetBoxProps {
   position: { x: number; y: number };
   onClose: () => void;
+  timerRef: React.RefObject<{ stop: () => void; reset: () => void } | null>;
 }
 
-const TargetBox = ({ position, onClose }: TargetBoxProps) => {
+const TargetBox = ({ position, onClose, timerRef }: TargetBoxProps) => {
   const [isVisible, setIsVisible] = useState(false);
   const targetRef = useRef<HTMLDivElement>(null);
-  const waldoPosition = { x: 166, y: 120 };
+  const waldoPosition = { x: 683, y: 324 };
   const tolerance = 10;
 
   useEffect(() => {
@@ -38,19 +40,27 @@ const TargetBox = ({ position, onClose }: TargetBoxProps) => {
       Math.abs(position.x - waldoPosition.x) <= tolerance &&
       Math.abs(position.y - waldoPosition.y) <= tolerance;
 
-    const result = {
-      x: Math.abs(position.x - waldoPosition.x),
-      y: Math.abs(position.y - waldoPosition.y),
-    };
+    // const result = {
+    //   x: Math.abs(position.x - waldoPosition.x),
+    //   y: Math.abs(position.y - waldoPosition.y),
+    // };
 
-    console.log(result);
+    // console.log(result);
 
     if (isWaldo && isCorrectPosition) {
-      console.log("🎉 You found Waldo! Amazing detective work!");
+      toast.success("🎉 You Found Waldo! 🎉", {
+        description: "Incredible! Your detective skills are top-notch!",
+      });
+      timerRef.current?.stop();
     } else if (isWaldo && !isCorrectPosition) {
-      console.log("🔍 That's not where Waldo is hiding. Keep looking!");
+      toast.error("🕵️ Not Quite Waldo... 🕵️", {
+        description:
+          "He's close, but that's not his exact spot! Try zooming in.",
+      });
     } else {
-      console.log(`❌ That's not ${character}. Try finding Waldo!`);
+      toast.error(`Whoops! Not ${character}!`, {
+        description: "That's a good spot, but Waldo is still out there!",
+      });
     }
     onClose();
   };

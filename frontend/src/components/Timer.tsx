@@ -8,15 +8,16 @@ interface TimerProps {
 
 const Timer = forwardRef(({ gameStarted }: TimerProps, ref) => {
   const [seconds, setSeconds] = useState(0);
+  const [isTimerActive, setIsTimerActive] = useState(false);
 
-  useImperativeHandle(ref, () => ({
-    reset: () => setSeconds(0),
-  }));
+  useEffect(() => {
+    setIsTimerActive(gameStarted);
+  }, [gameStarted]);
 
   useEffect(() => {
     let interval: ReturnType<typeof setInterval>;
 
-    if (gameStarted) {
+    if (isTimerActive) {
       interval = setInterval(() => {
         setSeconds((prev) => prev + 1);
       }, 1000);
@@ -25,7 +26,12 @@ const Timer = forwardRef(({ gameStarted }: TimerProps, ref) => {
     return () => {
       if (interval) clearInterval(interval);
     };
-  }, [gameStarted]);
+  }, [isTimerActive]);
+
+  useImperativeHandle(ref, () => ({
+    reset: () => setSeconds(0),
+    stop: () => setIsTimerActive(false),
+  }));
 
   const formatTime = (totalSeconds: number) => {
     const minutes = Math.floor(totalSeconds / 60);

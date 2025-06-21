@@ -8,6 +8,7 @@ import GameImage from "@/components/GameImage";
 
 interface TimerRef {
   reset: () => void;
+  stop: () => void;
 }
 
 const Index = () => {
@@ -52,6 +53,7 @@ const Index = () => {
               boxPosition={boxPosition}
               onBoxClose={handleTargetBoxClose}
               showDropdown={showDropdown}
+              timerRef={timerRef}
             />
           ) : (
             <Card className="w-full max-w-5xl">

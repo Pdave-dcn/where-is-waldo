@@ -12,6 +12,7 @@ interface GameImageProps {
   } | null;
   onBoxClose: () => void;
   showDropdown: boolean;
+  timerRef: React.RefObject<{ stop: () => void; reset: () => void } | null>;
 }
 
 const GameImage = ({
@@ -20,6 +21,7 @@ const GameImage = ({
   boxPosition,
   onBoxClose,
   showDropdown,
+  timerRef,
 }: GameImageProps) => {
   const imageRef = useRef<HTMLImageElement>(null);
 
@@ -37,7 +39,7 @@ const GameImage = ({
   };
 
   return (
-    <Card className="w-full max-w-5xl">
+    <Card className="w-full max-w-7xl">
       <CardContent className="relative">
         <img
           ref={imageRef}
@@ -57,7 +59,11 @@ const GameImage = ({
         </div>
 
         {boxPosition && showDropdown && (
-          <TargetBox position={boxPosition} onClose={onBoxClose} />
+          <TargetBox
+            position={boxPosition}
+            onClose={onBoxClose}
+            timerRef={timerRef}
+          />
         )}
       </CardContent>
     </Card>
