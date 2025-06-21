@@ -5,7 +5,7 @@ interface CharacterDropdownProps {
   onCharacterClick: (character: string) => void;
 }
 
-const characters = ["Waldo", "Wenda", "Odlaw", "Wizard Whitebeard"];
+const characters = ["Waldo", "Odlaw"];
 
 const CharacterDropdown = ({ onCharacterClick }: CharacterDropdownProps) => {
   const [isOpen, setIsOpen] = useState(true);

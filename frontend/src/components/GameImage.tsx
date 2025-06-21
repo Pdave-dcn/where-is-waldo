@@ -1,7 +1,8 @@
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { Card, CardContent } from "./ui/card";
 import { Search } from "lucide-react";
 import TargetBox from "./TargetBox";
+import { toast } from "sonner";
 
 interface GameImageProps {
   onImageClick: (x: number, y: number) => void;
@@ -24,6 +25,8 @@ const GameImage = ({
   timerRef,
 }: GameImageProps) => {
   const imageRef = useRef<HTMLImageElement>(null);
+  const [isWaldoFound, setIsWaldoFound] = useState(false);
+  const [isOdlawFound, setIsOdlawFound] = useState(false);
 
   const handleClick = (event: React.MouseEvent<HTMLImageElement>) => {
     if (!gameStarted || !imageRef.current) return;
@@ -37,6 +40,13 @@ const GameImage = ({
 
     onImageClick(x, y);
   };
+
+  if (isWaldoFound && isOdlawFound) {
+    toast.success("Game complete", {
+      description: "You've found both Waldo and Odlaw!!",
+    });
+    timerRef.current?.stop();
+  }
 
   return (
     <Card className="w-full max-w-7xl">
@@ -62,7 +72,9 @@ const GameImage = ({
           <TargetBox
             position={boxPosition}
             onClose={onBoxClose}
-            timerRef={timerRef}
+            // timerRef={timerRef}
+            setIsWaldoFound={setIsWaldoFound}
+            setIsOdlawFound={setIsOdlawFound}
           />
         )}
       </CardContent>
