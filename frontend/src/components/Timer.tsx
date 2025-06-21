@@ -29,8 +29,15 @@ const Timer = forwardRef(({ gameStarted }: TimerProps, ref) => {
   }, [isTimerActive]);
 
   useImperativeHandle(ref, () => ({
-    reset: () => setSeconds(0),
-    stop: () => setIsTimerActive(false),
+    reset: () => {
+      setIsTimerActive(false);
+      setSeconds(0);
+    },
+
+    stop: () => {
+      setIsTimerActive(false);
+      return seconds;
+    },
   }));
 
   const formatTime = (totalSeconds: number) => {

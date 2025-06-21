@@ -8,7 +8,7 @@ import GameImage from "@/components/GameImage";
 
 interface TimerRef {
   reset: () => void;
-  stop: () => void;
+  stop: () => number;
 }
 
 const Index = () => {

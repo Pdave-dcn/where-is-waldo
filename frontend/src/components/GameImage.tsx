@@ -12,7 +12,7 @@ interface GameImageProps {
   } | null;
   onBoxClose: () => void;
   showDropdown: boolean;
-  timerRef: React.RefObject<{ stop: () => void; reset: () => void } | null>;
+  timerRef: React.RefObject<{ stop: () => number; reset: () => void } | null>;
 }
 
 const GameImage = ({

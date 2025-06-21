@@ -5,7 +5,7 @@ import { toast } from "sonner";
 interface TargetBoxProps {
   position: { x: number; y: number };
   onClose: () => void;
-  timerRef: React.RefObject<{ stop: () => void; reset: () => void } | null>;
+  timerRef: React.RefObject<{ stop: () => number; reset: () => void } | null>;
 }
 
 const TargetBox = ({ position, onClose, timerRef }: TargetBoxProps) => {
@@ -51,7 +51,9 @@ const TargetBox = ({ position, onClose, timerRef }: TargetBoxProps) => {
       toast.success("🎉 You Found Waldo! 🎉", {
         description: "Incredible! Your detective skills are top-notch!",
       });
-      timerRef.current?.stop();
+
+      const stoppedTime = timerRef.current?.stop();
+      console.log(stoppedTime);
     } else if (isWaldo && !isCorrectPosition) {
       toast.error("🕵️ Not Quite Waldo... 🕵️", {
         description:
