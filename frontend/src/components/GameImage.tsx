@@ -3,6 +3,7 @@ import { Card, CardContent } from "./ui/card";
 import { Search } from "lucide-react";
 import TargetBox from "./TargetBox";
 import { toast } from "sonner";
+import FoundMark from "./FoundMark";
 
 interface GameImageProps {
   onImageClick: (x: number, y: number) => void;
@@ -27,6 +28,10 @@ const GameImage = ({
   const imageRef = useRef<HTMLImageElement>(null);
   const [isWaldoFound, setIsWaldoFound] = useState(false);
   const [isOdlawFound, setIsOdlawFound] = useState(false);
+
+  const waldoPosition = { x: 683, y: 324 };
+  const odlawPosition = { x: 528, y: 231 };
+  const tolerance = 10;
 
   const handleClick = (event: React.MouseEvent<HTMLImageElement>) => {
     if (!gameStarted || !imageRef.current) return;
@@ -72,10 +77,19 @@ const GameImage = ({
           <TargetBox
             position={boxPosition}
             onClose={onBoxClose}
-            // timerRef={timerRef}
+            waldoPosition={waldoPosition}
+            odlawPosition={odlawPosition}
+            tolerance={tolerance}
             setIsWaldoFound={setIsWaldoFound}
             setIsOdlawFound={setIsOdlawFound}
           />
+        )}
+
+        {isWaldoFound && (
+          <FoundMark position={waldoPosition} characterName="Waldo" />
+        )}
+        {isOdlawFound && (
+          <FoundMark position={odlawPosition} characterName="Odlaw" />
         )}
       </CardContent>
     </Card>

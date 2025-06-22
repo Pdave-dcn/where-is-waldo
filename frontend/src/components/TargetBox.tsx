@@ -2,10 +2,17 @@ import { useEffect, useRef, useState } from "react";
 import CharacterDropdown from "./CharacterDropdown";
 import { toast } from "sonner";
 
+interface Position {
+  x: number;
+  y: number;
+}
+
 interface TargetBoxProps {
-  position: { x: number; y: number };
+  position: Position;
   onClose: () => void;
-  // timerRef: React.RefObject<{ stop: () => number; reset: () => void } | null>;
+  waldoPosition: Position;
+  odlawPosition: Position;
+  tolerance: number;
   setIsWaldoFound: React.Dispatch<React.SetStateAction<boolean>>;
   setIsOdlawFound: React.Dispatch<React.SetStateAction<boolean>>;
 }
@@ -13,14 +20,14 @@ interface TargetBoxProps {
 const TargetBox = ({
   position,
   onClose,
+  waldoPosition,
+  odlawPosition,
+  tolerance,
   setIsWaldoFound,
   setIsOdlawFound,
 }: TargetBoxProps) => {
   const [isVisible, setIsVisible] = useState(false);
   const targetRef = useRef<HTMLDivElement>(null);
-  const waldoPosition = { x: 683, y: 324 };
-  const odlawPosition = { x: 528, y: 231 };
-  const tolerance = 10;
 
   useEffect(() => {
     setIsVisible(true);
@@ -60,9 +67,6 @@ const TargetBox = ({
         });
 
         setIsWaldoFound(true);
-
-        // const stoppedTime = timerRef.current?.stop();
-        // console.log(stoppedTime);
       } else {
         toast.error("🕵️ Not Quite Waldo... 🕵️", {
           description:
@@ -87,9 +91,6 @@ const TargetBox = ({
         });
 
         setIsOdlawFound(true);
-
-        // const stoppedTime = timerRef.current?.stop();
-        // console.log(stoppedTime);
       } else {
         toast.error("🕵️ Not Quite Odlaw... 🕵️", {
           description:
