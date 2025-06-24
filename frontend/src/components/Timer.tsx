@@ -3,16 +3,16 @@ import { Card, CardContent } from "./ui/card";
 import { Clock } from "lucide-react";
 
 interface TimerProps {
-  gameStarted: boolean;
+  isRunning: boolean;
 }
 
-const Timer = forwardRef(({ gameStarted }: TimerProps, ref) => {
+const Timer = forwardRef(({ isRunning }: TimerProps, ref) => {
   const [seconds, setSeconds] = useState(0);
   const [isTimerActive, setIsTimerActive] = useState(false);
 
   useEffect(() => {
-    setIsTimerActive(gameStarted);
-  }, [gameStarted]);
+    setIsTimerActive(isRunning);
+  }, [isRunning]);
 
   useEffect(() => {
     let interval: ReturnType<typeof setInterval>;

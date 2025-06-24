@@ -13,22 +13,26 @@ interface TimerRef {
 
 const Index = () => {
   const [gameStarted, setGameStarted] = useState(false);
+  const [gameEnded, setGameEnded] = useState(false);
   const [boxPosition, setBoxPosition] = useState<{
     x: number;
     y: number;
   } | null>(null);
   const [showDropdown, setShowDropdown] = useState(false);
   const timerRef = useRef<TimerRef>(null);
+  const [isWaldoFound, setIsWaldoFound] = useState(false);
+  const [isOdlawFound, setIsOdlawFound] = useState(false);
 
   const resetGame = () => {
     setGameStarted(false);
+    setGameEnded(false);
     timerRef.current?.reset();
     setBoxPosition(null);
     setShowDropdown(false);
   };
 
   const handleImageClick = (x: number, y: number) => {
-    if (!gameStarted) return;
+    if (!gameStarted || gameEnded) return;
 
     setBoxPosition({ x, y });
     setShowDropdown(true);
@@ -43,7 +47,7 @@ const Index = () => {
     <div className="flex flex-col gap-8 bg-accent">
       <Header />
       <main className="flex flex-col items-center gap-8 px-5">
-        <Timer gameStarted={gameStarted} ref={timerRef} />
+        <Timer isRunning={gameStarted && !gameEnded} ref={timerRef} />
 
         <div className="flex flex-col justify-center items-center w-full mx-auto">
           {gameStarted ? (
@@ -54,6 +58,11 @@ const Index = () => {
               onBoxClose={handleTargetBoxClose}
               showDropdown={showDropdown}
               timerRef={timerRef}
+              isWaldoFound={isWaldoFound}
+              isOdlawFound={isOdlawFound}
+              setIsWaldoFound={setIsWaldoFound}
+              setIsOdlawFound={setIsOdlawFound}
+              setGameEnded={setGameEnded}
             />
           ) : (
             <Card className="w-full max-w-5xl">

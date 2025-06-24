@@ -12,7 +12,7 @@ interface TargetBoxProps {
   onClose: () => void;
   waldoPosition: Position;
   odlawPosition: Position;
-  tolerance: number;
+  tolerance: Position;
   setIsWaldoFound: React.Dispatch<React.SetStateAction<boolean>>;
   setIsOdlawFound: React.Dispatch<React.SetStateAction<boolean>>;
 }
@@ -51,8 +51,8 @@ const TargetBox = ({
   const onCharacterClick = (character: string) => {
     if (character === "Waldo") {
       const isCorrectPosition =
-        Math.abs(position.x - waldoPosition.x) <= tolerance &&
-        Math.abs(position.y - waldoPosition.y) <= tolerance;
+        Math.abs(position.x - waldoPosition.x) <= tolerance.x &&
+        Math.abs(position.y - waldoPosition.y) <= tolerance.y;
 
       // const result = {
       //   x: Math.abs(position.x - waldoPosition.x),
@@ -75,8 +75,8 @@ const TargetBox = ({
       }
     } else if (character === "Odlaw") {
       const isCorrectPosition =
-        Math.abs(position.x - odlawPosition.x) <= tolerance &&
-        Math.abs(position.y - odlawPosition.y) <= tolerance;
+        Math.abs(position.x - odlawPosition.x) <= tolerance.x &&
+        Math.abs(position.y - odlawPosition.y) <= tolerance.y;
 
       // const result = {
       //   x: Math.abs(position.x - odlawPosition.x),
