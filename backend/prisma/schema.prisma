@@ -1,0 +1,60 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Model for storing game images
+model GameImage {
+  id             String @id @default(uuid())
+  name           String @unique
+  imageUrl       String
+  originalWidth  Int
+  originalHeight Int
+
+  characterLocations CharacterLocation[]
+  gameCompletions    GameCompletion[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// Model for storing the locations of characters on each GameImage
+model CharacterLocation {
+  id            String @id @default(uuid())
+  characterName String
+
+  targetXRatio    Float
+  targetYRatio    Float
+  toleranceXRatio Float
+  toleranceYRatio Float
+
+  gameImage   GameImage @relation(fields: [gameImageId], references: [id])
+  gameImageId String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([gameImageId, characterName])
+}
+
+// Model for storing game completion records
+model GameCompletion {
+  id               String @id @default(uuid())
+  playerName       String
+  timeTakenSeconds Float
+
+  gameImage   GameImage @relation(fields: [gameImageId], references: [id])
+  gameImageId String
+
+  completedAt DateTime @default(now())
+}
