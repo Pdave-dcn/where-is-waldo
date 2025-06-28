@@ -1,9 +1,10 @@
-import express, { Request, Response } from "express";
+import express, { RequestHandler } from "express";
+import { addNewImage, getImage } from "../controllers/image.controller.js";
 
 const router = express.Router();
 
-router.get("/api", (_req: Request, res: Response) => {
-  res.send("Hello from API");
-});
+router.post("/api/image", addNewImage as RequestHandler);
+
+router.get("/api/image/:id", getImage as RequestHandler);
 
 export default router;
