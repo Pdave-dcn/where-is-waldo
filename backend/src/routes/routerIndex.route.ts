@@ -1,10 +1,10 @@
-import express, { RequestHandler } from "express";
-import { addNewImage, getImage } from "../controllers/image.controller.js";
+import express from "express";
+import imageRoutes from "./image.route.js";
+import characterLocationRoutes from "./characterLocation.route.js";
 
 const router = express.Router();
 
-router.post("/api/image", addNewImage as RequestHandler);
-
-router.get("/api/image/:id", getImage as RequestHandler);
+router.use("/api", imageRoutes);
+router.use("/api", characterLocationRoutes);
 
 export default router;
