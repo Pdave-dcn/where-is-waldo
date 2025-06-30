@@ -38,7 +38,7 @@ model CharacterLocation {
   toleranceXRatio Float
   toleranceYRatio Float
 
-  gameImage   GameImage @relation(fields: [gameImageId], references: [id])
+  gameImage   GameImage @relation(fields: [gameImageId], references: [id], onDelete: Cascade)
   gameImageId String
 
   createdAt DateTime @default(now())
@@ -53,7 +53,7 @@ model GameCompletion {
   playerName       String
   timeTakenSeconds Float
 
-  gameImage   GameImage @relation(fields: [gameImageId], references: [id])
+  gameImage   GameImage @relation(fields: [gameImageId], references: [id], onDelete: Cascade)
   gameImageId String
 
   completedAt DateTime @default(now())
