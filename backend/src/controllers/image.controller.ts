@@ -2,9 +2,17 @@ import { Request, Response } from "express";
 import prisma from "../config/db.js";
 import { z } from "zod";
 
+const ImageIdParamSchema = z.object({
+  id: z.string().uuid("Invalid Image ID format in URL parameter."),
+});
+
 const NewImageSchema = z.object({
   name: z.string().min(1, "Name is required."),
-  imageUrl: z.string().url("Image URL must be a valid URL."),
+  imageUrl: z
+    .string()
+    .url("Image URL must be a valid URL.")
+    .min(1, "Image url is required."),
+  publicId: z.string().min(1, "Cloudinary Public ID is required."),
   originalWidth: z
     .number()
     .int()
@@ -28,12 +36,26 @@ export const addNewImage = async (req: Request, res: Response) => {
         .json({ message: "Image with this name already exists." });
     }
 
+    if (!validatedBody.imageUrl.includes("res.cloudinary.com")) {
+      return res
+        .status(400)
+        .json({
+          message: "Provided URL does not appear to be a Cloudinary URL.",
+        });
+    }
+
     const newImage = await prisma.gameImage.create({
-      data: validatedBody,
+      data: {
+        name: validatedBody.name,
+        imageUrl: validatedBody.imageUrl,
+        publicId: validatedBody.publicId,
+        originalWidth: validatedBody.originalWidth,
+        originalHeight: validatedBody.originalHeight,
+      },
     });
 
     res.status(201).json({
-      message: "Image added successfully",
+      message: "Game image details saved successfully",
       image: newImage,
     });
   } catch (error: unknown) {
@@ -53,14 +75,7 @@ export const addNewImage = async (req: Request, res: Response) => {
 
 export const getImage = async (req: Request, res: Response) => {
   try {
-    const imageId = req.params.id;
-    if (
-      !/^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/.test(
-        imageId
-      )
-    ) {
-      return res.status(400).json({ message: "Invalid image ID format." });
-    }
+    const { id: imageId } = ImageIdParamSchema.parse(req.params);
 
     const image = await prisma.gameImage.findUnique({
       where: { id: imageId },
@@ -77,7 +92,16 @@ export const getImage = async (req: Request, res: Response) => {
       message: "Image found successfully",
       image,
     });
-  } catch (error) {
+  } catch (error: unknown) {
+    if (error instanceof z.ZodError) {
+      return res.status(400).json({
+        message: "Validation failed",
+        errors: error.errors.map((err) => ({
+          path: err.path.join("."),
+          message: err.message,
+        })),
+      });
+    }
     console.error("Error getting image:", error);
     res.status(500).json({ message: "Internal server error." });
   }

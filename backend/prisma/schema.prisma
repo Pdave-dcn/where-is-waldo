@@ -17,7 +17,8 @@ datasource db {
 model GameImage {
   id             String @id @default(uuid())
   name           String @unique
-  imageUrl       String
+  imageUrl       String @unique
+  publicId       String @unique
   originalWidth  Int
   originalHeight Int
 
