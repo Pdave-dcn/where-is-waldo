@@ -5,6 +5,7 @@ import TargetBox from "./TargetBox";
 import { toast } from "sonner";
 import FoundMark from "./FoundMark";
 import { useGameData } from "@/hooks/use-GameData";
+import { Loader } from "./ui/loader";
 
 interface Position {
   x: number;
@@ -150,7 +151,7 @@ const GameImage = ({
   if (loading) {
     return (
       <div>
-        <h1>Loading game data...</h1>
+        <Loader />
       </div>
     );
   }

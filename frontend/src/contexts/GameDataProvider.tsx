@@ -47,9 +47,8 @@ export const GameDataProvider = ({
             `Network response was not ok: ${response.status} ${response.statusText}`
           );
         }
-        const rawData = await response.json();
-        console.log("Raw server response:", rawData);
 
+        const rawData = await response.json();
         const validatedResponse = ServerResponseSchema.parse(rawData);
 
         setImageData(validatedResponse.image);

@@ -5,6 +5,7 @@ import Footer from "@/components/Footer";
 import { useRef, useState } from "react";
 import Timer from "@/components/Timer";
 import GameImage from "@/components/GameImage";
+import { useGameData } from "@/hooks/use-GameData";
 
 interface TimerRef {
   reset: () => void;
@@ -22,6 +23,18 @@ const Index = () => {
   const timerRef = useRef<TimerRef>(null);
   const [isWaldoFound, setIsWaldoFound] = useState(false);
   const [isOdlawFound, setIsOdlawFound] = useState(false);
+
+  const { error } = useGameData();
+
+  const startGame = () => {
+    if (error) {
+      setGameStarted(false);
+      setGameEnded(false);
+      return;
+    }
+    setGameStarted(true);
+    setGameEnded(false);
+  };
 
   const resetGame = () => {
     setGameStarted(false);
@@ -75,10 +88,7 @@ const Index = () => {
                     Click on Waldo when you spot him in the crowd!
                   </p>
                 </div>
-                <Button
-                  onClick={() => setGameStarted(true)}
-                  className="self-center"
-                >
+                <Button onClick={() => startGame()} className="self-center">
                   Start game
                 </Button>
               </CardContent>
