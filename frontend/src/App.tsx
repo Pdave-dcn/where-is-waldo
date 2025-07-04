@@ -2,7 +2,7 @@ import Index from "./pages/Index";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import NotFound from "./pages/NotFound";
 import { Toaster } from "sonner";
-import { GameDataProvider } from "./contexts/GameDataContext";
+import { GameDataProvider } from "./contexts/GameDataProvider";
 
 const App = () => {
   return (
