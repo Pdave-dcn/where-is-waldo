@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import prisma from "../config/db.js";
 import { z } from "zod";
+import { Prisma } from "@prisma/client";
 
 const ImageIdParamSchema = z.object({
   id: z.string().uuid("Invalid Image ID format in URL parameter."),
@@ -37,11 +38,9 @@ export const addNewImage = async (req: Request, res: Response) => {
     }
 
     if (!validatedBody.imageUrl.includes("res.cloudinary.com")) {
-      return res
-        .status(400)
-        .json({
-          message: "Provided URL does not appear to be a Cloudinary URL.",
-        });
+      return res.status(400).json({
+        message: "Provided URL does not appear to be a Cloudinary URL.",
+      });
     }
 
     const newImage = await prisma.gameImage.create({
@@ -79,8 +78,22 @@ export const getImage = async (req: Request, res: Response) => {
 
     const image = await prisma.gameImage.findUnique({
       where: { id: imageId },
-      include: {
-        characterLocations: true,
+      select: {
+        id: true,
+        name: true,
+        imageUrl: true,
+        originalWidth: true,
+        originalHeight: true,
+        characterLocations: {
+          select: {
+            id: true,
+            characterName: true,
+            targetXRatio: true,
+            targetYRatio: true,
+            toleranceXRatio: true,
+            toleranceYRatio: true,
+          },
+        },
       },
     });
 
@@ -88,19 +101,31 @@ export const getImage = async (req: Request, res: Response) => {
       return res.status(404).json({ message: "Image not found" });
     }
 
+    const responseImage = {
+      id: image.id,
+      name: image.name,
+      url: image.imageUrl,
+      originalWidth: image.originalWidth,
+      originalHeight: image.originalHeight,
+      characterLocations: image.characterLocations,
+    };
+
     res.status(200).json({
       message: "Image found successfully",
-      image,
+      image: responseImage,
     });
   } catch (error: unknown) {
     if (error instanceof z.ZodError) {
       return res.status(400).json({
-        message: "Validation failed",
+        message: "Validation failed for request parameters.",
         errors: error.errors.map((err) => ({
           path: err.path.join("."),
           message: err.message,
         })),
       });
+    }
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      console.error("Prisma Error fetching image:", error.message);
     }
     console.error("Error getting image:", error);
     res.status(500).json({ message: "Internal server error." });

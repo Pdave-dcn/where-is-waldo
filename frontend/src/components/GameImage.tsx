@@ -1,31 +1,10 @@
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect, useCallback } from "react";
 import { Card, CardContent } from "./ui/card";
 import { Search } from "lucide-react";
 import TargetBox from "./TargetBox";
 import { toast } from "sonner";
 import FoundMark from "./FoundMark";
-
-const ORIGINAL_IMAGE_WIDTH = 2444;
-const ORIGINAL_IMAGE_HEIGHT = 1525;
-
-const CHARACTER_RATIO_DATA = [
-  {
-    id: "waldo",
-    name: "Waldo",
-    targetXRatio: 0.5646, // Calculated: 1380 / 2444
-    targetYRatio: 0.4262, // Calculated: 650 / 1525
-    toleranceXRatio: 40 / ORIGINAL_IMAGE_WIDTH, // approx. 0.0164
-    toleranceYRatio: 40 / ORIGINAL_IMAGE_HEIGHT, // approx. 0.0262
-  },
-  {
-    id: "odlaw",
-    name: "Odlaw",
-    targetXRatio: 0.4362, // Calculated: 1066 / 2444
-    targetYRatio: 0.3056, // Calculated: 466 / 1525
-    toleranceXRatio: 40 / ORIGINAL_IMAGE_WIDTH,
-    toleranceYRatio: 40 / ORIGINAL_IMAGE_HEIGHT,
-  },
-];
+import { useGameData } from "@/hooks/use-GameData";
 
 interface Position {
   x: number;
@@ -65,66 +44,99 @@ const GameImage = ({
   const [odlawPosition, setOdlawPosition] = useState<Position>({ x: 0, y: 0 });
   const [tolerance, setTolerance] = useState<Position>({ x: 0, y: 0 });
 
+  const { imageData, loading, error } = useGameData();
+
+  const calculateAndSetPositions = useCallback(() => {
+    const imgElement = imageRef.current;
+
+    if (!imgElement || !imageData) {
+      console.warn(
+        "Image element or image data not yet available for position calculation."
+      );
+      return;
+    }
+
+    const currentImageRect = imgElement.getBoundingClientRect();
+    const currentDisplayedWidth = currentImageRect.width;
+    const currentDisplayedHeight = currentImageRect.height;
+
+    if (currentDisplayedWidth === 0 || currentDisplayedHeight === 0) {
+      console.warn(
+        "Image dimensions are zero, cannot calculate positions yet."
+      );
+      return;
+    }
+
+    // Calculate scale based on loaded imageData's original dimensions
+    const scaleX = currentDisplayedWidth / imageData.originalWidth;
+    const scaleY = currentDisplayedHeight / imageData.originalHeight;
+
+    // Find character data from imageData.characterLocations
+    const waldoData = imageData.characterLocations.find(
+      (char) => char.characterName === "Waldo"
+    );
+    const odlawData = imageData.characterLocations.find(
+      (char) => char.characterName === "Odlaw"
+    );
+
+    if (!waldoData || !odlawData) {
+      console.error(
+        "Required character data (Waldo/Odlaw) not found in imageData.characterLocations."
+      );
+      // Display an error to the user or take other actions
+      return;
+    }
+
+    setWaldoPosition({
+      x: waldoData.targetXRatio * imageData.originalWidth * scaleX,
+      y: waldoData.targetYRatio * imageData.originalHeight * scaleY,
+    });
+
+    setOdlawPosition({
+      x: odlawData.targetXRatio * imageData.originalWidth * scaleX,
+      y: odlawData.targetYRatio * imageData.originalHeight * scaleY,
+    });
+
+    setTolerance({
+      x: waldoData.toleranceXRatio * imageData.originalWidth * scaleX,
+      y: waldoData.toleranceYRatio * imageData.originalHeight * scaleY,
+    });
+  }, [imageData]);
+
   useEffect(() => {
     const imgElement = imageRef.current;
 
-    const calculateAndSetPositions = () => {
-      if (imgElement) {
-        const currentImageRect = imgElement.getBoundingClientRect();
-        const currentDisplayedWidth = currentImageRect.width;
-        const currentDisplayedHeight = currentImageRect.height;
+    const handleLoad = () => calculateAndSetPositions();
+    const handleResize = () => calculateAndSetPositions();
 
-        // This is how much the image has scaled down/up from its original size
-        const scaleX = currentDisplayedWidth / ORIGINAL_IMAGE_WIDTH;
-        const scaleY = currentDisplayedHeight / ORIGINAL_IMAGE_HEIGHT;
-
-        if (currentDisplayedWidth === 0 || currentDisplayedHeight === 0) {
-          console.warn(
-            "Image dimensions are zero, cannot calculate positions."
-          );
-          return;
-        }
-
-        // Calculate Waldo's dynamic position based on original ratios and current scale
-        const waldoData = CHARACTER_RATIO_DATA.find(
-          (char) => char.id === "waldo"
-        )!;
-        setWaldoPosition({
-          x: waldoData.targetXRatio * ORIGINAL_IMAGE_WIDTH * scaleX,
-          y: waldoData.targetYRatio * ORIGINAL_IMAGE_HEIGHT * scaleY,
-        });
-
-        const odlawData = CHARACTER_RATIO_DATA.find(
-          (char) => char.id === "odlaw"
-        )!;
-        setOdlawPosition({
-          x: odlawData.targetXRatio * ORIGINAL_IMAGE_WIDTH * scaleX,
-          y: odlawData.targetYRatio * ORIGINAL_IMAGE_HEIGHT * scaleY,
-        });
-
-        setTolerance({
-          x: waldoData.toleranceXRatio * ORIGINAL_IMAGE_WIDTH * scaleX,
-          y: waldoData.toleranceYRatio * ORIGINAL_IMAGE_HEIGHT * scaleY,
-        });
+    if (imgElement) {
+      if (imgElement.complete) {
+        calculateAndSetPositions();
       }
-    };
-
-    // Recalculate on image load
-    if (imgElement && imgElement.complete) {
-      calculateAndSetPositions(); // If image already loaded
-    } else {
-      imgElement?.addEventListener("load", calculateAndSetPositions);
+      imgElement.addEventListener("load", handleLoad);
     }
-
-    // Recalculate on window resize
-    window.addEventListener("resize", calculateAndSetPositions);
+    window.addEventListener("resize", handleResize);
 
     return () => {
-      imgElement?.removeEventListener("load", calculateAndSetPositions);
-      window.removeEventListener("resize", calculateAndSetPositions);
+      if (imgElement) {
+        imgElement.removeEventListener("load", handleLoad);
+      }
+      window.removeEventListener("resize", handleResize);
     };
-  }, []);
+  }, [calculateAndSetPositions]);
 
+  // Game complete logic
+  useEffect(() => {
+    if (isWaldoFound && isOdlawFound) {
+      toast.success("Game complete", {
+        description: "You've found both Waldo and Odlaw!!",
+      });
+      timerRef.current?.stop();
+      setGameEnded(true);
+    }
+  }, [isWaldoFound, isOdlawFound, timerRef, setGameEnded]);
+
+  // Handle image click
   const handleClick = (event: React.MouseEvent<HTMLImageElement>) => {
     if (!gameStarted || !imageRef.current) return;
 
@@ -132,21 +144,31 @@ const GameImage = ({
     const x = event.clientX - imageRect.left;
     const y = event.clientY - imageRect.top;
 
-    // console.log(
-    //   "Clicked position (pixels relative to current image display):",
-    //   x,
-    //   y
-    // );
-
     onImageClick(x, y);
   };
 
-  if (isWaldoFound && isOdlawFound) {
-    toast.success("Game complete", {
-      description: "You've found both Waldo and Odlaw!!",
-    });
-    timerRef.current?.stop();
-    setGameEnded(true);
+  if (loading) {
+    return (
+      <div>
+        <h1>Loading game data...</h1>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div>
+        <h1>A network error has been encountered</h1>
+      </div>
+    );
+  }
+
+  if (!imageData) {
+    return (
+      <div>
+        <h1>No game data available.</h1>
+      </div>
+    );
   }
 
   return (
@@ -155,8 +177,8 @@ const GameImage = ({
         <img
           ref={imageRef}
           onClick={handleClick}
-          src="img-1.jpg"
-          alt="Where's Waldo Game Image"
+          src={imageData.url}
+          alt={imageData.name}
           className="block w-full h-auto"
         />
 
