@@ -131,3 +131,27 @@ export const getImage = async (req: Request, res: Response) => {
     res.status(500).json({ message: "Internal server error." });
   }
 };
+
+export const getAllImages = async (_req: Request, res: Response) => {
+  try {
+    const images = await prisma.gameImage.findMany({
+      select: {
+        id: true,
+        name: true,
+        imageUrl: true,
+      },
+    });
+
+    res.status(200).json({
+      message: "Images found successfully",
+      images,
+    });
+  } catch (error: unknown) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      console.error("Prisma Error fetching image:", error.message);
+    }
+
+    console.error("Error getting image:", error);
+    res.status(500).json({ message: "Internal server error." });
+  }
+};
