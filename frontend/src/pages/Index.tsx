@@ -6,6 +6,7 @@ import { useRef, useState } from "react";
 import Timer from "@/components/Timer";
 import GameImage from "@/components/GameImage";
 import { useGameData } from "@/hooks/use-GameData";
+import ImageSelector from "@/components/ImageSelector";
 
 interface TimerRef {
   reset: () => void;
@@ -24,10 +25,10 @@ const Index = () => {
   const [isWaldoFound, setIsWaldoFound] = useState(false);
   const [isOdlawFound, setIsOdlawFound] = useState(false);
 
-  const { error } = useGameData();
+  const { allImagesError, selectedImageError, selectedImageId } = useGameData();
 
   const startGame = () => {
-    if (error) {
+    if (allImagesError || selectedImageError) {
       setGameStarted(false);
       setGameEnded(false);
       return;
@@ -55,6 +56,18 @@ const Index = () => {
     setBoxPosition(null);
     setShowDropdown(false);
   };
+
+  if (!selectedImageId) {
+    return (
+      <div className="min-h-screen bg-background flex flex-col">
+        <Header />
+        <main className="flex-1">
+          <ImageSelector />
+        </main>
+        <Footer resetGame={resetGame} />
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col gap-8 bg-accent">

@@ -1,6 +1,10 @@
 import { useEffect, useState } from "react";
 import { z } from "zod";
-import { GameDataContext, type ImageData } from "./GameDataContext";
+import {
+  GameDataContext,
+  type ImageData,
+  type AvailableImage,
+} from "./GameDataContext";
 
 const CharacterLocationSchema = z.object({
   id: z.string(),
@@ -25,6 +29,17 @@ const ServerResponseSchema = z.object({
   image: ImageDataSchema,
 });
 
+const AvailableImageSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  imageUrl: z.string().url(),
+});
+
+const AllImagesResponseSchema = z.object({
+  message: z.string(),
+  images: z.array(AvailableImageSchema),
+});
+
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL as string;
 
 export const GameDataProvider = ({
@@ -32,16 +47,27 @@ export const GameDataProvider = ({
 }: {
   children: React.ReactNode;
 }) => {
+  const [allAvailableImages, setAllAvailableImages] = useState<
+    AvailableImage[] | null
+  >(null);
+  const [allImagesLoading, setAllImagesLoading] = useState(true);
+  const [allImagesError, setAllImagesError] = useState<Error | null>(null);
+
+  const [selectedImageId, setSelectedImageId] = useState<string | null>(null);
+  const [selectedImageLoading, setSelectedImageLoading] = useState(true);
+  const [selectedImageError, setSelectedImageError] = useState<Error | null>(
+    null
+  );
+
   const [imageData, setImageData] = useState<ImageData | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchAllImages = async () => {
+      setAllImagesLoading(true);
+      setAllImagesError(null);
+
       try {
-        const response = await fetch(
-          `${API_BASE_URL}/image/0cf10bcd-b08a-4548-ab47-9058888100c6`
-        );
+        const response = await fetch(`${API_BASE_URL}/images`);
         if (!response.ok) {
           throw new Error(
             `Network response was not ok: ${response.status} ${response.statusText}`
@@ -49,14 +75,14 @@ export const GameDataProvider = ({
         }
 
         const rawData = await response.json();
-        const validatedResponse = ServerResponseSchema.parse(rawData);
+        const validatedResponse = AllImagesResponseSchema.parse(rawData);
 
-        setImageData(validatedResponse.image);
-        setError(null);
+        setAllAvailableImages(validatedResponse.images);
+        setAllImagesError(null);
       } catch (error: unknown) {
         console.error("Error fetching game data:", error);
         if (error instanceof z.ZodError) {
-          setError(
+          setAllImagesError(
             new Error(
               `Data validation failed: ${error.errors
                 .map((e) => e.message)
@@ -64,22 +90,76 @@ export const GameDataProvider = ({
             )
           );
         } else if (error instanceof Error) {
-          setError(error);
+          setAllImagesError(error);
         } else {
-          setError(
+          setAllImagesError(
             new Error("An unknown error occurred while fetching game data.")
           );
         }
       } finally {
-        setLoading(false);
+        setAllImagesLoading(false);
       }
     };
-
-    fetchData();
+    fetchAllImages();
   }, []);
 
+  const selectImage = async (imageId: string) => {
+    setSelectedImageId(imageId);
+    setSelectedImageLoading(true);
+    setSelectedImageError(null);
+    setImageData(null);
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/image/${imageId}`);
+      if (!response.ok) {
+        throw new Error(
+          `Network response was not ok: ${response.status} ${response.statusText}`
+        );
+      }
+
+      const rawData = await response.json();
+      const validatedResponse = ServerResponseSchema.parse(rawData);
+
+      setImageData(validatedResponse.image);
+      setSelectedImageError(null);
+    } catch (error: unknown) {
+      console.error(
+        `Error fetching selected image data for ID ${imageId}:`,
+        error
+      );
+      if (error instanceof z.ZodError) {
+        setSelectedImageError(
+          new Error(
+            `Data validation failed: ${error.errors
+              .map((e) => e.message)
+              .join(", ")}`
+          )
+        );
+      } else if (error instanceof Error) {
+        setSelectedImageError(error);
+      } else {
+        setSelectedImageError(
+          new Error("An unknown error occurred while fetching game data.")
+        );
+      }
+    } finally {
+      setSelectedImageLoading(false);
+    }
+  };
+
   return (
-    <GameDataContext.Provider value={{ imageData, error, loading }}>
+    <GameDataContext.Provider
+      value={{
+        allAvailableImages,
+        allImagesError,
+        allImagesLoading,
+        selectedImageId,
+        selectImage,
+        imageData,
+        selectedImageLoading,
+        selectedImageError,
+      }}
+    >
       {children}
     </GameDataContext.Provider>
   );

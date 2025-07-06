@@ -45,7 +45,7 @@ const GameImage = ({
   const [odlawPosition, setOdlawPosition] = useState<Position>({ x: 0, y: 0 });
   const [tolerance, setTolerance] = useState<Position>({ x: 0, y: 0 });
 
-  const { imageData, loading, error } = useGameData();
+  const { imageData, selectedImageLoading, selectedImageError } = useGameData();
 
   const calculateAndSetPositions = useCallback(() => {
     const imgElement = imageRef.current;
@@ -148,7 +148,7 @@ const GameImage = ({
     onImageClick(x, y);
   };
 
-  if (loading) {
+  if (selectedImageLoading) {
     return (
       <div>
         <Loader />
@@ -156,7 +156,7 @@ const GameImage = ({
     );
   }
 
-  if (error) {
+  if (selectedImageError) {
     return (
       <div>
         <h1>A network error has been encountered</h1>
