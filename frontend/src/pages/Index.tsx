@@ -43,6 +43,8 @@ const Index = () => {
     timerRef.current?.reset();
     setBoxPosition(null);
     setShowDropdown(false);
+    setIsWaldoFound(false);
+    setIsOdlawFound(false);
   };
 
   const handleImageClick = (x: number, y: number) => {
