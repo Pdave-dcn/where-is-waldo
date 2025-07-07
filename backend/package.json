@@ -6,7 +6,11 @@
   "scripts": {
     "dev": "tsx watch src/index.ts",
     "build": "tsc",
-    "start": "node dist/index.js"
+    "start": "node dist/index.js",
+    "prisma:migrate": "npx prisma migrate dev",
+    "prisma:generate": "npx prisma generate",
+    "prisma:studio": "npx prisma studio",
+    "db:seed": "npx prisma db seed"
   },
   "keywords": [],
   "author": "",
@@ -32,5 +36,8 @@
     "dotenv": "^17.0.0",
     "express": "^5.1.0",
     "zod": "^3.25.67"
+  },
+  "prisma": {
+    "seed": "tsx src/seeds/seed.ts"
   }
 }

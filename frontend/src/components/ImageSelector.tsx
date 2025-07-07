@@ -2,6 +2,33 @@ import { useGameData } from "@/hooks/use-GameData";
 import { Loader } from "./ui/loader";
 import { Button } from "./ui/button";
 
+// Helper function to generate a Cloudinary thumbnail URL
+const getThumbnailUrl = (
+  originalUrl: string,
+  width: number,
+  height: number = 0
+): string => {
+  if (!originalUrl || !originalUrl.includes("cloudinary.com")) {
+    return originalUrl;
+  }
+
+  // Split the URL to insert transformations
+  // Example: https://res.cloudinary.com/<cloud_name>/image/upload/v12345/public_id.jpg
+  // We want to insert 'w_X,h_Y,c_fill,q_auto,f_auto' after '/upload/'
+  const parts = originalUrl.split("/upload/");
+  if (parts.length !== 2) {
+    return originalUrl;
+  }
+
+  // Using c_fill for maintaining consistent dimensions in a grid
+  // Using q_auto and f_auto for optimal performance and file size
+  const transformation = `w_${width}${
+    height > 0 ? `,h_${height}` : ""
+  },c_fill,q_auto,f_auto`;
+
+  return `${parts[0]}/upload/${transformation}/${parts[1]}`;
+};
+
 const ImageSelector = () => {
   const {
     allAvailableImages,
@@ -40,6 +67,9 @@ const ImageSelector = () => {
     return null;
   }
 
+  const thumbnailWidth = 400;
+  const thumbnailHeight = 250;
+
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-8">
@@ -56,16 +86,21 @@ const ImageSelector = () => {
               key={option.id}
               className={`relative rounded-lg shadow-lg border-4 transition-all duration-200 cursor-pointer transform hover:scale-105 ${
                 selectedImageId === option.id
-                  ? "border ring-4"
-                  : "border hover:border"
+                  ? "border-primary ring-4 ring-primary/50"
+                  : "border-transparent hover:border-muted"
               }`}
               onClick={() => selectImage(option.id)}
             >
-              <div className="aspect-video overflow-hidden rounded-t-lg">
+              <div className="aspect-video overflow-hidden rounded-t-lg bg-gray-100">
                 <img
-                  src={option.imageUrl}
+                  src={getThumbnailUrl(
+                    option.imageUrl,
+                    thumbnailWidth,
+                    thumbnailHeight
+                  )}
                   alt={option.name}
                   className="w-full h-full object-cover"
+                  loading="lazy"
                 />
               </div>
               <div className="p-4">
