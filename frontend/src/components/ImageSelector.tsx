@@ -55,7 +55,7 @@ const ImageSelector = () => {
             <div
               key={option.id}
               className={`relative rounded-lg shadow-lg border-4 transition-all duration-200 cursor-pointer transform hover:scale-105 ${
-                selectedImageId === option.imageUrl
+                selectedImageId === option.id
                   ? "border ring-4"
                   : "border hover:border"
               }`}
@@ -70,6 +70,9 @@ const ImageSelector = () => {
               </div>
               <div className="p-4">
                 <h3 className="font-bold text-lg mb-2">{option.name}</h3>
+                <p className="text-muted-foreground text-sm">
+                  {option.description}
+                </p>
               </div>
             </div>
           ))}

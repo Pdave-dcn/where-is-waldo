@@ -18,6 +18,7 @@ const CharacterLocationSchema = z.object({
 const ImageDataSchema = z.object({
   id: z.string(),
   name: z.string(),
+  description: z.string(),
   url: z.string().url(),
   originalWidth: z.number().int().positive(),
   originalHeight: z.number().int().positive(),
@@ -33,6 +34,7 @@ const AvailableImageSchema = z.object({
   id: z.string(),
   name: z.string(),
   imageUrl: z.string().url(),
+  description: z.string(),
 });
 
 const AllImagesResponseSchema = z.object({

@@ -13,6 +13,7 @@ const NewImageSchema = z.object({
     .string()
     .url("Image URL must be a valid URL.")
     .min(1, "Image url is required."),
+  description: z.string().min(1, "Description is required."),
   publicId: z.string().min(1, "Cloudinary Public ID is required."),
   originalWidth: z
     .number()
@@ -47,6 +48,7 @@ export const addNewImage = async (req: Request, res: Response) => {
       data: {
         name: validatedBody.name,
         imageUrl: validatedBody.imageUrl,
+        description: validatedBody.description,
         publicId: validatedBody.publicId,
         originalWidth: validatedBody.originalWidth,
         originalHeight: validatedBody.originalHeight,
@@ -81,6 +83,7 @@ export const getImage = async (req: Request, res: Response) => {
       select: {
         id: true,
         name: true,
+        description: true,
         imageUrl: true,
         originalWidth: true,
         originalHeight: true,
@@ -104,6 +107,7 @@ export const getImage = async (req: Request, res: Response) => {
     const responseImage = {
       id: image.id,
       name: image.name,
+      description: image.description,
       url: image.imageUrl,
       originalWidth: image.originalWidth,
       originalHeight: image.originalHeight,
@@ -138,6 +142,7 @@ export const getAllImages = async (_req: Request, res: Response) => {
       select: {
         id: true,
         name: true,
+        description: true,
         imageUrl: true,
       },
     });
