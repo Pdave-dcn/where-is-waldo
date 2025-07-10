@@ -81,8 +81,10 @@ export const getLeaderboardForImage = async (req: Request, res: Response) => {
     const leaderboard = await prisma.gameCompletion.findMany({
       where: { gameImageId: imageId },
       select: {
+        id: true,
         playerName: true,
         timeTakenSeconds: true,
+        completedAt: true,
       },
       orderBy: {
         timeTakenSeconds: "asc",

@@ -1,6 +1,8 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useGameData } from "@/hooks/use-GameData";
 
 interface WinnerFormProps {
   secondsTakenRef: React.RefObject<number | null>;
@@ -8,12 +10,17 @@ interface WinnerFormProps {
 
 const WinnerForm = ({ secondsTakenRef }: WinnerFormProps) => {
   const [name, setName] = useState("");
+  const { createGameCompletion } = useGameData();
+
+  const navigate = useNavigate();
+
+  if (!secondsTakenRef) return;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (name.trim()) {
-      console.log(name);
-      console.log(secondsTakenRef.current);
+    if (secondsTakenRef.current) {
+      createGameCompletion(secondsTakenRef.current, name);
+      navigate("/leaderboard");
     }
   };
 
@@ -66,10 +73,16 @@ const WinnerForm = ({ secondsTakenRef }: WinnerFormProps) => {
               type="submit"
               className="flex-1 bg-green-600 hover:bg-green-700"
               disabled={!name.trim()}
+              onClick={() => handleSubmit}
             >
               Save Score
             </Button>
-            <Button type="button" variant="outline" className="flex-1">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => handleSubmit}
+              className="flex-1"
+            >
               Skip
             </Button>
           </div>
