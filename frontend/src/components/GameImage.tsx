@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import FoundMark from "./FoundMark";
 import { useGameData } from "@/hooks/use-GameData";
 import { Loader } from "./ui/loader";
+import WinnerForm from "./WinnerForm";
 
 interface Position {
   x: number;
@@ -44,6 +45,8 @@ const GameImage = ({
   const [waldoPosition, setWaldoPosition] = useState<Position>({ x: 0, y: 0 });
   const [odlawPosition, setOdlawPosition] = useState<Position>({ x: 0, y: 0 });
   const [tolerance, setTolerance] = useState<Position>({ x: 0, y: 0 });
+
+  const secondsTakenRef = useRef<number | null>(null);
 
   const { imageData, selectedImageLoading, selectedImageError } = useGameData();
 
@@ -132,7 +135,8 @@ const GameImage = ({
       toast.success("Game complete", {
         description: "You've found both Waldo and Odlaw!!",
       });
-      timerRef.current?.stop();
+      const time = timerRef.current?.stop();
+      secondsTakenRef.current = time ?? null;
       setGameEnded(true);
     }
   }, [isWaldoFound, isOdlawFound, timerRef, setGameEnded]);
@@ -209,6 +213,10 @@ const GameImage = ({
         )}
         {isOdlawFound && (
           <FoundMark position={odlawPosition} characterName="Odlaw" />
+        )}
+
+        {isWaldoFound && isOdlawFound && (
+          <WinnerForm secondsTakenRef={secondsTakenRef} />
         )}
       </CardContent>
     </Card>
