@@ -103,7 +103,7 @@ const LeaderboardPage = () => {
         {/* Back Button */}
         <Button
           variant="ghost"
-          className="flex items-center gap-2 text-lg text-primary hover:text-primary-dark"
+          className="flex items-center gap-2 text-lg text-primary hover:text-primary-dark cursor-pointer"
           onClick={() => {
             navigate("/");
             setSelectedImageId(null);

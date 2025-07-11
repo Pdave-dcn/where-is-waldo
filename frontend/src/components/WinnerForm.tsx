@@ -71,17 +71,17 @@ const WinnerForm = ({ secondsTakenRef }: WinnerFormProps) => {
           <div className="flex space-x-3">
             <Button
               type="submit"
-              className="flex-1 bg-green-600 hover:bg-green-700"
+              className="flex-1 bg-green-600 hover:bg-green-700 cursor-pointer"
               disabled={!name.trim()}
               onClick={() => handleSubmit}
             >
               Save Score
             </Button>
             <Button
-              type="button"
+              type="submit"
               variant="outline"
               onClick={() => handleSubmit}
-              className="flex-1"
+              className="flex-1 cursor-pointer"
             >
               Skip
             </Button>

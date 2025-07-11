@@ -214,11 +214,10 @@ const GameImage = ({
         {isOdlawFound && (
           <FoundMark position={odlawPosition} characterName="Odlaw" />
         )}
-
-        {isWaldoFound && isOdlawFound && (
-          <WinnerForm secondsTakenRef={secondsTakenRef} />
-        )}
       </CardContent>
+      {isWaldoFound && isOdlawFound && (
+        <WinnerForm secondsTakenRef={secondsTakenRef} />
+      )}
     </Card>
   );
 };

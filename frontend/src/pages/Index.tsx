@@ -61,7 +61,7 @@ const Index = () => {
 
   if (!selectedImageId) {
     return (
-      <div className="min-h-screen bg-background flex flex-col">
+      <div className="min-h-screen flex flex-col">
         <Header />
         <main className="flex-1">
           <ImageSelector />
@@ -103,7 +103,10 @@ const Index = () => {
                     Click on Waldo when you spot him in the crowd!
                   </p>
                 </div>
-                <Button onClick={() => startGame()} className="self-center">
+                <Button
+                  onClick={() => startGame()}
+                  className="self-center cursor-pointer"
+                >
                   Start game
                 </Button>
               </CardContent>

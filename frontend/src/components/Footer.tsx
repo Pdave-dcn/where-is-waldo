@@ -12,18 +12,24 @@ const Footer = ({ resetGame }: FooterProps) => {
           <Button
             onClick={resetGame}
             variant={"ghost"}
-            className="flex items-center space-x-2"
+            className="flex items-center space-x-2 cursor-pointer"
           >
             <RotateCcw className="w-5 h-5" />
             <span>Restart Game</span>
           </Button>
 
-          <Button variant={"ghost"} className="flex items-center space-x-2">
+          <Button
+            variant={"ghost"}
+            className="flex items-center space-x-2 cursor-pointer"
+          >
             <HelpCircle className="w-5 h-5" />
             <span>How to Play</span>
           </Button>
 
-          <Button variant={"ghost"} className="flex items-center space-x-2">
+          <Button
+            variant={"ghost"}
+            className="flex items-center space-x-2 cursor-pointer"
+          >
             <Users className="w-5 h-5" />
             <span>Credits</span>
           </Button>
