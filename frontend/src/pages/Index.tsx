@@ -7,6 +7,7 @@ import Timer from "@/components/Timer";
 import GameImage from "@/components/GameImage";
 import { useGameData } from "@/hooks/use-GameData";
 import ImageSelector from "@/components/ImageSelector";
+import PauseOverlay from "@/components/PauseOverlay";
 
 interface TimerRef {
   reset: () => void;
@@ -24,6 +25,7 @@ const Index = () => {
   const timerRef = useRef<TimerRef>(null);
   const [isWaldoFound, setIsWaldoFound] = useState(false);
   const [isOdlawFound, setIsOdlawFound] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
 
   const { allImagesError, selectedImageError, selectedImageId } = useGameData();
 
@@ -37,6 +39,18 @@ const Index = () => {
     setGameEnded(false);
   };
 
+  const handleTogglePause = () => {
+    setIsPaused(!isPaused);
+    if (!isPaused) {
+      setShowDropdown(false);
+      setBoxPosition(null);
+    }
+  };
+
+  const handlePauseResume = () => {
+    setIsPaused(false);
+  };
+
   const resetGame = () => {
     setGameStarted(false);
     setGameEnded(false);
@@ -45,6 +59,7 @@ const Index = () => {
     setShowDropdown(false);
     setIsWaldoFound(false);
     setIsOdlawFound(false);
+    setIsPaused(false);
   };
 
   const handleImageClick = (x: number, y: number) => {
@@ -75,7 +90,12 @@ const Index = () => {
     <div className="flex flex-col gap-8 bg-accent">
       <Header />
       <main className="flex flex-col items-center gap-8 px-5">
-        <Timer isRunning={gameStarted && !gameEnded} ref={timerRef} />
+        <Timer
+          isRunning={gameStarted && !gameEnded}
+          ref={timerRef}
+          isPaused={isPaused}
+          onPauseToggle={handleTogglePause}
+        />
 
         <div className="flex flex-col justify-center items-center w-full mx-auto">
           {gameStarted ? (
@@ -91,6 +111,7 @@ const Index = () => {
               setIsWaldoFound={setIsWaldoFound}
               setIsOdlawFound={setIsOdlawFound}
               setGameEnded={setGameEnded}
+              isPaused={isPaused}
             />
           ) : (
             <Card className="w-full max-w-5xl">
@@ -115,6 +136,10 @@ const Index = () => {
         </div>
       </main>
       <Footer resetGame={resetGame} />
+
+      {isPaused && (
+        <PauseOverlay onRestart={resetGame} onResume={handlePauseResume} />
+      )}
     </div>
   );
 };

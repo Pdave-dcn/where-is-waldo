@@ -25,6 +25,7 @@ interface GameImageProps {
   setIsWaldoFound: React.Dispatch<React.SetStateAction<boolean>>;
   setIsOdlawFound: React.Dispatch<React.SetStateAction<boolean>>;
   setGameEnded: React.Dispatch<React.SetStateAction<boolean>>;
+  isPaused: boolean;
 }
 
 const GameImage = ({
@@ -39,6 +40,7 @@ const GameImage = ({
   setIsWaldoFound,
   setIsOdlawFound,
   setGameEnded,
+  isPaused,
 }: GameImageProps) => {
   const imageRef = useRef<HTMLImageElement>(null);
 
@@ -186,6 +188,10 @@ const GameImage = ({
           alt={imageData.name}
           className="block w-full h-auto"
         />
+
+        {isPaused && (
+          <div className="absolute inset-0 bg-primary/50 backdrop-blur-md flex items-center justify-center p-4 rounded-lg" />
+        )}
 
         <div className="absolute inset-0 pointer-events-none">
           <div className="absolute flex gap-1 top-0 left-4 bg-background bg-opacity-90 rounded-lg px-2 py-2 shadow-lg">
