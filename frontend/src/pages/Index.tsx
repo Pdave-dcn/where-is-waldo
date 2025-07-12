@@ -8,6 +8,7 @@ import GameImage from "@/components/GameImage";
 import { useGameData } from "@/hooks/use-GameData";
 import ImageSelector from "@/components/ImageSelector";
 import PauseOverlay from "@/components/PauseOverlay";
+import { useNavigate } from "react-router-dom";
 
 interface TimerRef {
   reset: () => void;
@@ -27,7 +28,14 @@ const Index = () => {
   const [isOdlawFound, setIsOdlawFound] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
 
-  const { allImagesError, selectedImageError, selectedImageId } = useGameData();
+  const navigate = useNavigate();
+
+  const {
+    allImagesError,
+    selectedImageError,
+    selectedImageId,
+    setSelectedImageId,
+  } = useGameData();
 
   const startGame = () => {
     if (allImagesError || selectedImageError) {
@@ -49,6 +57,13 @@ const Index = () => {
 
   const handlePauseResume = () => {
     setIsPaused(false);
+  };
+
+  const handlePauseQuit = () => {
+    setSelectedImageId(null);
+    navigate("/");
+    setIsPaused(false);
+    resetGame();
   };
 
   const resetGame = () => {
@@ -138,7 +153,11 @@ const Index = () => {
       <Footer resetGame={resetGame} />
 
       {isPaused && (
-        <PauseOverlay onRestart={resetGame} onResume={handlePauseResume} />
+        <PauseOverlay
+          onRestart={resetGame}
+          onResume={handlePauseResume}
+          onQuit={handlePauseQuit}
+        />
       )}
     </div>
   );

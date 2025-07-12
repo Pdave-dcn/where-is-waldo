@@ -1,12 +1,13 @@
-import { Play, RotateCcw } from "lucide-react";
+import { Play, RotateCcw, Home } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface PauseOverlayProps {
   onResume: () => void;
   onRestart: () => void;
+  onQuit: () => void;
 }
 
-const PauseOverlay = ({ onResume, onRestart }: PauseOverlayProps) => {
+const PauseOverlay = ({ onResume, onRestart, onQuit }: PauseOverlayProps) => {
   return (
     <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center">
       <div className="bg-white rounded-lg p-8 shadow-2xl border-4 text-center max-w-md mx-4">
@@ -15,7 +16,7 @@ const PauseOverlay = ({ onResume, onRestart }: PauseOverlayProps) => {
           Take a break! The timer is paused.
         </p>
 
-        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+        <div className="flex flex-col gap-4 justify-center">
           <Button
             onClick={onResume}
             className="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-full transition-colors duration-200 flex items-center gap-2 cursor-pointer"
@@ -31,6 +32,15 @@ const PauseOverlay = ({ onResume, onRestart }: PauseOverlayProps) => {
           >
             <RotateCcw className="w-5 h-5" />
             Restart Game
+          </Button>
+
+          <Button
+            onClick={onQuit}
+            variant="outline"
+            className="font-bold py-3 px-6 rounded-full flex items-center gap-2 justify-center cursor-pointer"
+          >
+            <Home className="w-5 h-5" />
+            Choose Another Image
           </Button>
         </div>
       </div>
