@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect, useCallback } from "react";
+import { useRef, useState, useEffect, useCallback, useMemo } from "react";
 import { Card, CardContent } from "./ui/card";
 import { Search } from "lucide-react";
 import TargetBox from "./TargetBox";
@@ -7,6 +7,7 @@ import FoundMark from "./FoundMark";
 import { useGameData } from "@/hooks/use-GameData";
 import { Loader } from "./ui/loader";
 import WinnerForm from "./WinnerForm";
+import debounce from "lodash.debounce";
 
 interface Position {
   x: number;
@@ -89,7 +90,6 @@ const GameImage = ({
       console.error(
         "Required character data (Waldo/Odlaw) not found in imageData.characterLocations."
       );
-      // Display an error to the user or take other actions
       return;
     }
 
@@ -109,15 +109,20 @@ const GameImage = ({
     });
   }, [imageData]);
 
+  const debouncedCalculatePositions = useMemo(
+    () => debounce(calculateAndSetPositions, 100),
+    [calculateAndSetPositions]
+  );
+
   useEffect(() => {
     const imgElement = imageRef.current;
 
-    const handleLoad = () => calculateAndSetPositions();
-    const handleResize = () => calculateAndSetPositions();
+    const handleLoad = () => debouncedCalculatePositions();
+    const handleResize = () => debouncedCalculatePositions();
 
     if (imgElement) {
       if (imgElement.complete) {
-        calculateAndSetPositions();
+        debouncedCalculatePositions();
       }
       imgElement.addEventListener("load", handleLoad);
     }
@@ -128,8 +133,9 @@ const GameImage = ({
         imgElement.removeEventListener("load", handleLoad);
       }
       window.removeEventListener("resize", handleResize);
+      debouncedCalculatePositions.cancel();
     };
-  }, [calculateAndSetPositions]);
+  }, [debouncedCalculatePositions]);
 
   // Game complete logic
   useEffect(() => {
