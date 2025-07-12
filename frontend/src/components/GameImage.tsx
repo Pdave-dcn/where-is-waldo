@@ -60,6 +60,11 @@ const GameImage = ({
       console.warn(
         "Image element or image data not yet available for position calculation."
       );
+
+      setWaldoPosition({ x: 0, y: 0 });
+      setOdlawPosition({ x: 0, y: 0 });
+      setTolerance({ x: 0, y: 0 });
+
       return;
     }
 
@@ -71,43 +76,84 @@ const GameImage = ({
       console.warn(
         "Image dimensions are zero, cannot calculate positions yet."
       );
+
       return;
     }
 
-    // Calculate scale based on loaded imageData's original dimensions
-    const scaleX = currentDisplayedWidth / imageData.originalWidth;
-    const scaleY = currentDisplayedHeight / imageData.originalHeight;
+    try {
+      if (imageData.originalWidth === 0 || imageData.originalHeight === 0) {
+        console.error(
+          "Original image dimensions are zero or invalid in imageData."
+        );
+        toast.error("Critical game data missing", {
+          description: "Original image dimensions are invalid.",
+        });
 
-    // Find character data from imageData.characterLocations
-    const waldoData = imageData.characterLocations.find(
-      (char) => char.characterName === "Waldo"
-    );
-    const odlawData = imageData.characterLocations.find(
-      (char) => char.characterName === "Odlaw"
-    );
+        setWaldoPosition({ x: 0, y: 0 });
+        setOdlawPosition({ x: 0, y: 0 });
+        setTolerance({ x: 0, y: 0 });
 
-    if (!waldoData || !odlawData) {
-      console.error(
-        "Required character data (Waldo/Odlaw) not found in imageData.characterLocations."
+        return;
+      }
+
+      // Calculate scale based on loaded imageData's original dimensions
+      const scaleX = currentDisplayedWidth / imageData.originalWidth;
+      const scaleY = currentDisplayedHeight / imageData.originalHeight;
+
+      // Find character data from imageData.characterLocations
+      const waldoData = imageData.characterLocations.find(
+        (char) => char.characterName === "Waldo"
       );
-      return;
+      const odlawData = imageData.characterLocations.find(
+        (char) => char.characterName === "Odlaw"
+      );
+
+      if (!waldoData || !odlawData) {
+        console.error(
+          "Required character data (Waldo/Odlaw) not found in imageData.characterLocations."
+        );
+        toast.error("Game Setup Error", {
+          description: "Critical character data is missing for this image.",
+          duration: 5000,
+        });
+
+        setWaldoPosition({ x: 0, y: 0 });
+        setOdlawPosition({ x: 0, y: 0 });
+        setTolerance({ x: 0, y: 0 });
+
+        return;
+      }
+
+      setWaldoPosition({
+        x: waldoData.targetXRatio * imageData.originalWidth * scaleX,
+        y: waldoData.targetYRatio * imageData.originalHeight * scaleY,
+      });
+
+      setOdlawPosition({
+        x: odlawData.targetXRatio * imageData.originalWidth * scaleX,
+        y: odlawData.targetYRatio * imageData.originalHeight * scaleY,
+      });
+
+      setTolerance({
+        x: waldoData.toleranceXRatio * imageData.originalWidth * scaleX,
+        y: waldoData.toleranceYRatio * imageData.originalHeight * scaleY,
+      });
+    } catch (error: unknown) {
+      console.error(
+        "An unexpected error occurred while calculating character positions:",
+        error
+      );
+      toast.error("Calculation Error", {
+        description:
+          "There was an unexpected issue calculating character positions. Please refresh.",
+        duration: 5000,
+      });
+
+      setWaldoPosition({ x: 0, y: 0 });
+      setOdlawPosition({ x: 0, y: 0 });
+      setTolerance({ x: 0, y: 0 });
     }
-
-    setWaldoPosition({
-      x: waldoData.targetXRatio * imageData.originalWidth * scaleX,
-      y: waldoData.targetYRatio * imageData.originalHeight * scaleY,
-    });
-
-    setOdlawPosition({
-      x: odlawData.targetXRatio * imageData.originalWidth * scaleX,
-      y: odlawData.targetYRatio * imageData.originalHeight * scaleY,
-    });
-
-    setTolerance({
-      x: waldoData.toleranceXRatio * imageData.originalWidth * scaleX,
-      y: waldoData.toleranceYRatio * imageData.originalHeight * scaleY,
-    });
-  }, [imageData]);
+  }, [imageData, setWaldoPosition, setOdlawPosition, setTolerance]);
 
   const debouncedCalculatePositions = useMemo(
     () => debounce(calculateAndSetPositions, 100),
