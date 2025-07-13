@@ -7,7 +7,9 @@ import { Loader } from "./ui/loader";
 import WinnerForm from "./WinnerForm";
 import useCharacterPositions from "@/hooks/use-CharacterPositions";
 import useGameCompletion from "@/hooks/use-GameCompletion";
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
+import ShimmerSkeleton from "./ShimmerSkeleton";
+import { toast } from "sonner";
 
 interface Position {
   x: number;
@@ -52,6 +54,8 @@ const GameImage = ({
     setGameEnded
   );
 
+  const [imageLoaded, setImageLoaded] = useState(false);
+
   // Handle image click
   const handleClick = useCallback(
     (event: React.MouseEvent<HTMLImageElement>) => {
@@ -66,96 +70,131 @@ const GameImage = ({
     [gameStarted, onImageClick, imageRef]
   );
 
+  const handleImageLoad = useCallback(() => {
+    setImageLoaded(true);
+  }, []);
+
+  const handleImageError = useCallback(() => {
+    setImageLoaded(false);
+    toast.error("Game image error", {
+      description: "An unexpected error occurred while loading the image.",
+    });
+  }, []);
+
   if (selectedImageLoading) {
     return (
-      <Card className="w-full max-w-7xl">
-        <CardContent className="p-8 flex items-center justify-center">
-          <div className="text-center">
-            <Loader />
-            <p className="mt-4 text-muted-foreground">Loading game...</p>
-          </div>
-        </CardContent>
-      </Card>
+      <div className="flex items-center justify-center bg-accent py-10">
+        <Card className="w-full max-w-5xl">
+          <CardContent className="p-8 flex items-center justify-center">
+            <div className="text-center">
+              <Loader />
+              <p className="mt-4 text-muted-foreground">Loading game...</p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
     );
   }
 
   if (selectedImageError) {
     return (
-      <Card className="w-full max-w-7xl">
-        <CardContent className="p-8 text-center">
-          <h2 className="text-2xl font-bold text-destructive mb-4">
-            Network Error
-          </h2>
-          <p className="text-muted-foreground">
-            Unable to load the game. Please check your internet connection and
-            try again.
-          </p>
-        </CardContent>
-      </Card>
+      <div className="flex items-center justify-center bg-accent py-10">
+        <Card className="w-full max-w-5xl">
+          <CardContent className="p-8 text-center">
+            <h2 className="text-2xl font-bold text-destructive mb-4">
+              Network Error
+            </h2>
+            <p className="text-muted-foreground">
+              Unable to load the game. Please check your internet connection and
+              try again.
+            </p>
+          </CardContent>
+        </Card>
+      </div>
     );
   }
 
   if (!imageData) {
     return (
-      <Card className="w-full max-w-7xl">
-        <CardContent className="p-8 text-center">
-          <h2 className="text-2xl font-bold text-muted-foreground">
-            No Game Data
-          </h2>
-          <p className="text-muted-foreground">No game data available.</p>
-        </CardContent>
-      </Card>
+      <div className="flex items-center justify-center bg-accent py-10">
+        <Card className="w-full max-w-5xl">
+          <CardContent className="p-8 text-center">
+            <h2 className="text-2xl font-bold text-muted-foreground">
+              No Game Data
+            </h2>
+            <p className="text-muted-foreground">No game data available.</p>
+          </CardContent>
+        </Card>
+      </div>
     );
   }
+
+  const aspectRatio = imageData.originalWidth / imageData.originalHeight;
 
   return (
     <Card className="w-full max-w-7xl">
       <CardContent className="relative p-0">
+        {/* Show skeleton while image is loading */}
+        {!imageLoaded && (
+          <ShimmerSkeleton aspectRatio={aspectRatio} className="rounded-lg" />
+        )}
+
+        {/* Actual image - hidden until loaded */}
         <img
           ref={imageRef}
           onClick={handleClick}
           src={imageData.url}
           alt={imageData.name}
-          className="block w-full h-auto"
+          className={`block w-full h-auto transition-opacity duration-300 ${
+            imageLoaded ? "opacity-100" : "opacity-0 absolute inset-0"
+          }`}
+          onLoad={handleImageLoad}
+          onError={handleImageError}
+          loading="eager"
         />
 
-        {isPaused && (
-          <div className="absolute inset-0 bg-primary/50 backdrop-blur-md flex items-center justify-center p-4 rounded-lg" />
-        )}
+        {/* Game UI elements - only show when image is loaded */}
+        {imageLoaded && (
+          <>
+            {isPaused && (
+              <div className="absolute inset-0 bg-primary/50 backdrop-blur-md flex items-center justify-center p-4 rounded-lg" />
+            )}
 
-        <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute flex gap-1 top-0 left-4 bg-background bg-opacity-90 rounded-lg px-2 py-2 shadow-lg">
-            <Search size={20} />
-            <p className="text-sm font-semibold text-muted-foreground">
-              Click on Waldo or Odlaw when you find them!
-            </p>
-          </div>
-        </div>
+            <div className="absolute inset-0 pointer-events-none">
+              <div className="absolute flex gap-1 top-0 left-4 bg-background bg-opacity-90 rounded-lg px-2 py-2 shadow-lg">
+                <Search size={20} />
+                <p className="text-sm font-semibold text-muted-foreground">
+                  Click on Waldo or Odlaw when you find them!
+                </p>
+              </div>
+            </div>
 
-        {characters.map((char) => {
-          if (
-            (char.characterName === "Waldo" && isWaldoFound) ||
-            (char.characterName === "Odlaw" && isOdlawFound)
-          ) {
-            return (
-              <FoundMark
-                key={char.characterName}
-                characterName={char.characterName}
-                position={char.position}
+            {characters.map((char) => {
+              if (
+                (char.characterName === "Waldo" && isWaldoFound) ||
+                (char.characterName === "Odlaw" && isOdlawFound)
+              ) {
+                return (
+                  <FoundMark
+                    key={char.characterName}
+                    characterName={char.characterName}
+                    position={char.position}
+                  />
+                );
+              }
+              return null;
+            })}
+
+            {boxPosition && showDropdown && (
+              <TargetBox
+                position={boxPosition}
+                onClose={onBoxClose}
+                characterData={characters}
+                setIsWaldoFound={setIsWaldoFound}
+                setIsOdlawFound={setIsOdlawFound}
               />
-            );
-          }
-          return null;
-        })}
-
-        {boxPosition && showDropdown && (
-          <TargetBox
-            position={boxPosition}
-            onClose={onBoxClose}
-            characterData={characters}
-            setIsWaldoFound={setIsWaldoFound}
-            setIsOdlawFound={setIsOdlawFound}
-          />
+            )}
+          </>
         )}
       </CardContent>
 
