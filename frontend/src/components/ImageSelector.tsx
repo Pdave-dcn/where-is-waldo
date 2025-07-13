@@ -1,6 +1,7 @@
 import { useGameData } from "@/hooks/use-GameData";
 import { Loader } from "./ui/loader";
 import { Button } from "./ui/button";
+import { Card, CardContent } from "./ui/card";
 
 // Helper function to generate a Cloudinary thumbnail URL
 const getThumbnailUrl = (
@@ -40,31 +41,54 @@ const ImageSelector = () => {
 
   if (allImagesLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <Loader />
+      <div className="flex items-center justify-center bg-accent py-10">
+        <Card className="w-full max-w-5xl">
+          <CardContent className="p-8 flex items-center justify-center">
+            <div className="text-center flex flex-col items-center">
+              <Loader />
+              <p className="mt-4 text-muted-foreground">Loading game...</p>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     );
   }
 
   if (allImagesError) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="text-center">
-          <h2 className="text-2xl font-bold mb-2">Failed to load images</h2>
-          <p className="mb-4 text-red-600">{allImagesError.message}</p>
-          <Button
-            className="px-4 py-2 bg-accent rounded hover:bg-accent-dark transition"
-            onClick={() => window.location.reload()}
-          >
-            Retry
-          </Button>
-        </div>
+      <div className="flex items-center justify-center bg-accent py-10">
+        <Card className="w-full max-w-5xl">
+          <CardContent className="p-8 text-center">
+            <h2 className="text-2xl font-bold text-destructive mb-4">
+              Failed to load images
+            </h2>
+            <p className="text-muted-foreground">Unable to load the game.</p>
+            <Button
+              variant={"outline"}
+              className="px-4 py-2 rounded mt-3"
+              onClick={() => window.location.reload()}
+            >
+              Retry
+            </Button>
+          </CardContent>
+        </Card>
       </div>
     );
   }
 
   if (!allAvailableImages) {
-    return null;
+    return (
+      <div className="flex items-center justify-center bg-accent py-10">
+        <Card className="w-full max-w-5xl">
+          <CardContent className="p-8 text-center">
+            <h2 className="text-2xl font-bold text-muted-foreground">
+              No Game Data
+            </h2>
+            <p className="text-muted-foreground">No game data available.</p>
+          </CardContent>
+        </Card>
+      </div>
+    );
   }
 
   const thumbnailWidth = 400;
