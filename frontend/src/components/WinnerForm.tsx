@@ -5,21 +5,21 @@ import { Input } from "@/components/ui/input";
 import { useGameData } from "@/hooks/use-GameData";
 
 interface WinnerFormProps {
-  secondsTakenRef: React.RefObject<number | null>;
+  secondsTaken: number | null;
 }
 
-const WinnerForm = ({ secondsTakenRef }: WinnerFormProps) => {
+const WinnerForm = ({ secondsTaken }: WinnerFormProps) => {
   const [name, setName] = useState("");
   const { createGameCompletion } = useGameData();
 
   const navigate = useNavigate();
 
-  if (!secondsTakenRef) return;
+  if (!secondsTaken) return;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (secondsTakenRef.current) {
-      createGameCompletion(secondsTakenRef.current, name);
+    if (secondsTaken) {
+      createGameCompletion(secondsTaken, name);
       navigate("/leaderboard");
     }
   };
@@ -30,7 +30,7 @@ const WinnerForm = ({ secondsTakenRef }: WinnerFormProps) => {
       .padStart(2, "0")}`;
   };
 
-  if (!secondsTakenRef.current) {
+  if (!secondsTaken) {
     return;
   }
 
@@ -44,7 +44,7 @@ const WinnerForm = ({ secondsTakenRef }: WinnerFormProps) => {
           <p className="text-gray-600 text-lg">
             You found both Waldo and Odlaw in{" "}
             <span className="font-bold text-green-600">
-              {formatTime(secondsTakenRef.current)}
+              {formatTime(secondsTaken)}
             </span>
           </p>
         </div>

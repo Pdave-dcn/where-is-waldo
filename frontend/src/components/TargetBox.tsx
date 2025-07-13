@@ -1,6 +1,7 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useMemo } from "react";
 import CharacterDropdown from "./CharacterDropdown";
 import { toast } from "sonner";
+import { type CharacterData } from "@/hooks/use-CharacterPositions";
 
 interface Position {
   x: number;
@@ -10,9 +11,7 @@ interface Position {
 interface TargetBoxProps {
   position: Position;
   onClose: () => void;
-  waldoPosition: Position;
-  odlawPosition: Position;
-  tolerance: Position;
+  characterData: CharacterData[];
   setIsWaldoFound: React.Dispatch<React.SetStateAction<boolean>>;
   setIsOdlawFound: React.Dispatch<React.SetStateAction<boolean>>;
 }
@@ -20,9 +19,7 @@ interface TargetBoxProps {
 const TargetBox = ({
   position,
   onClose,
-  waldoPosition,
-  odlawPosition,
-  tolerance,
+  characterData,
   setIsWaldoFound,
   setIsOdlawFound,
 }: TargetBoxProps) => {
@@ -48,18 +45,27 @@ const TargetBox = ({
     };
   }, [onClose]);
 
+  const waldoData = useMemo(
+    () => characterData.find((char) => char.characterName === "Waldo"),
+    [characterData]
+  );
+
+  const odlawData = useMemo(
+    () => characterData.find((char) => char.characterName === "Odlaw"),
+    [characterData]
+  );
+
   const onCharacterClick = (character: string) => {
+    if (!waldoData || !odlawData) {
+      console.error("Required character data (Waldo/Odlaw) not found.");
+
+      return;
+    }
+
     if (character === "Waldo") {
       const isCorrectPosition =
-        Math.abs(position.x - waldoPosition.x) <= tolerance.x &&
-        Math.abs(position.y - waldoPosition.y) <= tolerance.y;
-
-      // const result = {
-      //   x: Math.abs(position.x - waldoPosition.x),
-      //   y: Math.abs(position.y - waldoPosition.y),
-      // };
-
-      // console.log(result);
+        Math.abs(position.x - waldoData.position.x) <= waldoData.tolerance.x &&
+        Math.abs(position.y - waldoData.position.y) <= waldoData.position.y;
 
       if (isCorrectPosition) {
         toast.success("🎉 You Found Waldo! 🎉", {
@@ -75,15 +81,8 @@ const TargetBox = ({
       }
     } else if (character === "Odlaw") {
       const isCorrectPosition =
-        Math.abs(position.x - odlawPosition.x) <= tolerance.x &&
-        Math.abs(position.y - odlawPosition.y) <= tolerance.y;
-
-      // const result = {
-      //   x: Math.abs(position.x - odlawPosition.x),
-      //   y: Math.abs(position.y - odlawPosition.y),
-      // };
-
-      // console.log(result);
+        Math.abs(position.x - odlawData.position.x) <= odlawData.tolerance.x &&
+        Math.abs(position.y - odlawData.position.y) <= odlawData.tolerance.y;
 
       if (isCorrectPosition) {
         toast.success("🎉 You Found Odlaw! 🎉", {
