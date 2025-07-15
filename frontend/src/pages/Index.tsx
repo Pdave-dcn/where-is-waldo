@@ -148,7 +148,7 @@ const Index = () => {
                 </div>
                 <Button
                   onClick={() => startGame()}
-                  className="self-center cursor-pointer"
+                  className="self-center cursor-pointer sm:text-lg"
                 >
                   Start game
                 </Button>

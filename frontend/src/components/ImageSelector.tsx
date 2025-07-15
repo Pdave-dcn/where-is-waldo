@@ -115,7 +115,7 @@ const ImageSelector = () => {
               }`}
               onClick={() => selectImage(option.id)}
             >
-              <div className="aspect-video overflow-hidden rounded-t-lg bg-gray-100">
+              <div className="aspect-video overflow-hidden rounded-t-lg bg-background">
                 <img
                   src={getThumbnailUrl(
                     option.imageUrl,

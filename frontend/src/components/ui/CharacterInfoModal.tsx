@@ -37,7 +37,7 @@ export const CharacterInfoModal = ({ isOpen }: CharacterInfoModalProps) => {
 
   return (
     <Dialog open={isOpen && open} onOpenChange={() => {}}>
-      <DialogContent className="sm:max-w-md mx-4">
+      <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Target className="w-6 h-6" />

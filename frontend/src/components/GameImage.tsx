@@ -144,7 +144,7 @@ const GameImage = ({
             )}
 
             <div className="absolute inset-0 pointer-events-none">
-              <div className="absolute flex gap-1 top-0 left-4 bg-background bg-opacity-90 rounded-lg px-2 py-2 shadow-lg">
+              <div className="hidden absolute sm:flex gap-1 top-0 left-4 bg-background bg-opacity-90 rounded-lg px-2 py-2 shadow-lg">
                 <Search size={20} />
                 <p className="text-sm font-semibold text-muted-foreground">
                   Find the hidden characters!
