@@ -1,7 +1,8 @@
-import { useEffect, useRef, useState, useMemo } from "react";
+import { useEffect, useRef, useState } from "react";
 import CharacterDropdown from "./CharacterDropdown";
 import { toast } from "sonner";
 import { type CharacterData } from "@/hooks/use-CharacterPositions";
+import { useGameProgress } from "@/hooks/use-GameProgress";
 
 interface Position {
   x: number;
@@ -12,19 +13,12 @@ interface TargetBoxProps {
   position: Position;
   onClose: () => void;
   characterData: CharacterData[];
-  setIsWaldoFound: React.Dispatch<React.SetStateAction<boolean>>;
-  setIsOdlawFound: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const TargetBox = ({
-  position,
-  onClose,
-  characterData,
-  setIsWaldoFound,
-  setIsOdlawFound,
-}: TargetBoxProps) => {
+const TargetBox = ({ position, onClose, characterData }: TargetBoxProps) => {
   const [isVisible, setIsVisible] = useState(false);
   const targetRef = useRef<HTMLDivElement>(null);
+  const { markCharacterAsFound } = useGameProgress();
 
   useEffect(() => {
     setIsVisible(true);
@@ -45,57 +39,29 @@ const TargetBox = ({
     };
   }, [onClose]);
 
-  const waldoData = useMemo(
-    () => characterData.find((char) => char.characterName === "Waldo"),
-    [characterData]
-  );
-
-  const odlawData = useMemo(
-    () => characterData.find((char) => char.characterName === "Odlaw"),
-    [characterData]
-  );
-
   const onCharacterClick = (character: string) => {
-    if (!waldoData || !odlawData) {
-      console.error("Required character data (Waldo/Odlaw) not found.");
+    const selectedCharacter = characterData.find(
+      (char) => char.characterName === character
+    );
 
-      return;
-    }
+    if (!selectedCharacter) return;
 
-    if (character === "Waldo") {
-      const isCorrectPosition =
-        Math.abs(position.x - waldoData.position.x) <= waldoData.tolerance.x &&
-        Math.abs(position.y - waldoData.position.y) <= waldoData.position.y;
+    const isCorrectPosition =
+      Math.abs(position.x - selectedCharacter.position.x) <=
+        selectedCharacter.tolerance.x &&
+      Math.abs(position.y - selectedCharacter.position.y) <=
+        selectedCharacter.tolerance.y;
 
-      if (isCorrectPosition) {
-        toast.success("🎉 You Found Waldo! 🎉", {
-          description: "Incredible! Your detective skills are top-notch!",
-        });
-
-        setIsWaldoFound(true);
-      } else {
-        toast.error("🕵️ Not Quite Waldo... 🕵️", {
-          description:
-            "He's close, but that's not his exact spot! Try zooming in.",
-        });
-      }
-    } else if (character === "Odlaw") {
-      const isCorrectPosition =
-        Math.abs(position.x - odlawData.position.x) <= odlawData.tolerance.x &&
-        Math.abs(position.y - odlawData.position.y) <= odlawData.tolerance.y;
-
-      if (isCorrectPosition) {
-        toast.success("🎉 You Found Odlaw! 🎉", {
-          description: "Incredible! Your detective skills are top-notch!",
-        });
-
-        setIsOdlawFound(true);
-      } else {
-        toast.error("🕵️ Not Quite Odlaw... 🕵️", {
-          description:
-            "He's close, but that's not his exact spot! Try zooming in.",
-        });
-      }
+    if (isCorrectPosition) {
+      toast.success(`🎉 You Found ${character}! 🎉`, {
+        description: "Incredible! Your detective skills are top-notch!",
+      });
+      markCharacterAsFound(character);
+    } else {
+      toast.error(`🕵️ Not Quite ${character}... 🕵️`, {
+        description:
+          "He's close, but that's not his exact spot! Try zooming in.",
+      });
     }
 
     onClose();

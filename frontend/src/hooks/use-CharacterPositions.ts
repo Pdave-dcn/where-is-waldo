@@ -9,7 +9,7 @@ interface Position {
 }
 
 export interface CharacterData {
-  characterName: "Waldo" | "Odlaw";
+  characterName: string;
   position: Position;
   tolerance: Position;
 }
@@ -44,17 +44,8 @@ const useCharacterPositions = (imageData: ImageData | null) => {
       const scaleX = currentDisplayedWidth / imageData.originalWidth;
       const scaleY = currentDisplayedHeight / imageData.originalHeight;
 
-      const waldoData = imageData.characterLocations.find(
-        (char) => char.characterName === "Waldo"
-      );
-      const odlawData = imageData.characterLocations.find(
-        (char) => char.characterName === "Odlaw"
-      );
-
-      if (!waldoData || !odlawData) {
-        console.error(
-          "Required character data (Waldo/Odlaw) not found in imageData.characterLocations."
-        );
+      if (imageData.characterLocations.length === 0) {
+        console.error("Required character data not found in imageData.");
         toast.error("Game Setup Error", {
           description: "Critical character data is missing for this image.",
           duration: 5000,
@@ -63,30 +54,21 @@ const useCharacterPositions = (imageData: ImageData | null) => {
         return;
       }
 
-      const newCharacters: CharacterData[] = [
-        {
-          characterName: "Waldo",
-          position: {
-            x: waldoData.targetXRatio * imageData.originalWidth * scaleX,
-            y: waldoData.targetYRatio * imageData.originalHeight * scaleY,
-          },
-          tolerance: {
-            x: waldoData.toleranceXRatio * imageData.originalWidth * scaleX,
-            y: waldoData.toleranceYRatio * imageData.originalHeight * scaleY,
-          },
-        },
-        {
-          characterName: "Odlaw",
-          position: {
-            x: odlawData.targetXRatio * imageData.originalWidth * scaleX,
-            y: odlawData.targetYRatio * imageData.originalHeight * scaleY,
-          },
-          tolerance: {
-            x: odlawData.toleranceXRatio * imageData.originalWidth * scaleX,
-            y: odlawData.toleranceYRatio * imageData.originalHeight * scaleY,
-          },
-        },
-      ];
+      const newCharacters: CharacterData[] = imageData.characterLocations.map(
+        (charData) => {
+          return {
+            characterName: charData.characterName,
+            position: {
+              x: charData.targetXRatio * imageData.originalWidth * scaleX,
+              y: charData.targetYRatio * imageData.originalHeight * scaleY,
+            },
+            tolerance: {
+              x: charData.toleranceXRatio * imageData.originalWidth * scaleX,
+              y: charData.toleranceYRatio * imageData.originalHeight * scaleY,
+            },
+          };
+        }
+      );
 
       setCharacters(newCharacters);
     } catch (error: unknown) {

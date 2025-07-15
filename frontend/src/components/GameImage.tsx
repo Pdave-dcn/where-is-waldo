@@ -4,12 +4,11 @@ import TargetBox from "./TargetBox";
 import FoundMark from "./FoundMark";
 import { useGameData } from "@/hooks/use-GameData";
 import { Loader } from "./ui/loader";
-import WinnerForm from "./WinnerForm";
 import useCharacterPositions from "@/hooks/use-CharacterPositions";
-import useGameCompletion from "@/hooks/use-GameCompletion";
 import { useCallback, useState } from "react";
 import ShimmerSkeleton from "./ShimmerSkeleton";
 import { toast } from "sonner";
+import { useGameProgress } from "@/hooks/use-GameProgress";
 
 interface Position {
   x: number;
@@ -22,12 +21,6 @@ interface GameImageProps {
   boxPosition: Position | null;
   onBoxClose: () => void;
   showDropdown: boolean;
-  timerRef: React.RefObject<{ stop: () => number; reset: () => void } | null>;
-  isWaldoFound: boolean;
-  isOdlawFound: boolean;
-  setIsWaldoFound: React.Dispatch<React.SetStateAction<boolean>>;
-  setIsOdlawFound: React.Dispatch<React.SetStateAction<boolean>>;
-  setGameEnded: React.Dispatch<React.SetStateAction<boolean>>;
   isPaused: boolean;
 }
 
@@ -37,22 +30,12 @@ const GameImage = ({
   boxPosition,
   onBoxClose,
   showDropdown,
-  timerRef,
-  isWaldoFound,
-  isOdlawFound,
-  setIsWaldoFound,
-  setIsOdlawFound,
-  setGameEnded,
   isPaused,
 }: GameImageProps) => {
   const { imageData, selectedImageLoading, selectedImageError } = useGameData();
   const { characters, imageRef } = useCharacterPositions(imageData);
-  const secondsTaken = useGameCompletion(
-    isOdlawFound,
-    isWaldoFound,
-    timerRef,
-    setGameEnded
-  );
+
+  const { isCharacterFound } = useGameProgress();
 
   const [imageLoaded, setImageLoaded] = useState(false);
 
@@ -164,16 +147,13 @@ const GameImage = ({
               <div className="absolute flex gap-1 top-0 left-4 bg-background bg-opacity-90 rounded-lg px-2 py-2 shadow-lg">
                 <Search size={20} />
                 <p className="text-sm font-semibold text-muted-foreground">
-                  Click on Waldo or Odlaw when you find them!
+                  Find the hidden characters!
                 </p>
               </div>
             </div>
 
             {characters.map((char) => {
-              if (
-                (char.characterName === "Waldo" && isWaldoFound) ||
-                (char.characterName === "Odlaw" && isOdlawFound)
-              ) {
+              if (isCharacterFound(char.characterName)) {
                 return (
                   <FoundMark
                     key={char.characterName}
@@ -190,17 +170,11 @@ const GameImage = ({
                 position={boxPosition}
                 onClose={onBoxClose}
                 characterData={characters}
-                setIsWaldoFound={setIsWaldoFound}
-                setIsOdlawFound={setIsOdlawFound}
               />
             )}
           </>
         )}
       </CardContent>
-
-      {isWaldoFound && isOdlawFound && (
-        <WinnerForm secondsTaken={secondsTaken} />
-      )}
     </Card>
   );
 };

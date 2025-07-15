@@ -2,13 +2,17 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Timer from "@/components/Timer";
 import GameImage from "@/components/GameImage";
 import { useGameData } from "@/hooks/use-GameData";
 import ImageSelector from "@/components/ImageSelector";
 import PauseOverlay from "@/components/PauseOverlay";
 import { useNavigate } from "react-router-dom";
+import useGameCompletion from "@/hooks/use-GameCompletion";
+import WinnerForm from "@/components/WinnerForm";
+import { useGameProgress } from "@/hooks/use-GameProgress";
+import { CharacterInfoModal } from "@/components/ui/CharacterInfoModal";
 
 interface TimerRef {
   reset: () => void;
@@ -23,11 +27,15 @@ const Index = () => {
     y: number;
   } | null>(null);
   const [showDropdown, setShowDropdown] = useState(false);
-  const timerRef = useRef<TimerRef>(null);
-  const [isWaldoFound, setIsWaldoFound] = useState(false);
-  const [isOdlawFound, setIsOdlawFound] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
+  const [showInfoModal, setShowInfoModal] = useState(false);
 
+  const timerRef = useRef<TimerRef>(null);
+
+  const secondsTaken = useGameCompletion(timerRef, setGameEnded);
+  const { areAllCharactersFound, resetGame: resetGameProgress } =
+    useGameProgress();
+  const isGameComplete = areAllCharactersFound();
   const navigate = useNavigate();
 
   const {
@@ -36,6 +44,12 @@ const Index = () => {
     selectedImageId,
     setSelectedImageId,
   } = useGameData();
+
+  useEffect(() => {
+    if (selectedImageId && !gameStarted && !gameEnded) {
+      setShowInfoModal(true);
+    }
+  }, [selectedImageId, gameStarted, gameEnded]);
 
   const startGame = () => {
     if (allImagesError || selectedImageError) {
@@ -72,9 +86,8 @@ const Index = () => {
     timerRef.current?.reset();
     setBoxPosition(null);
     setShowDropdown(false);
-    setIsWaldoFound(false);
-    setIsOdlawFound(false);
     setIsPaused(false);
+    resetGameProgress();
   };
 
   const handleImageClick = (x: number, y: number) => {
@@ -120,12 +133,6 @@ const Index = () => {
               boxPosition={boxPosition}
               onBoxClose={handleTargetBoxClose}
               showDropdown={showDropdown}
-              timerRef={timerRef}
-              isWaldoFound={isWaldoFound}
-              isOdlawFound={isOdlawFound}
-              setIsWaldoFound={setIsWaldoFound}
-              setIsOdlawFound={setIsOdlawFound}
-              setGameEnded={setGameEnded}
               isPaused={isPaused}
             />
           ) : (
@@ -152,6 +159,10 @@ const Index = () => {
       </main>
       <Footer resetGame={resetGame} />
 
+      {selectedImageId && showInfoModal && (
+        <CharacterInfoModal isOpen={showInfoModal} />
+      )}
+
       {isPaused && (
         <PauseOverlay
           onRestart={resetGame}
@@ -159,6 +170,8 @@ const Index = () => {
           onQuit={handlePauseQuit}
         />
       )}
+
+      {isGameComplete && <WinnerForm secondsTaken={secondsTaken} />}
     </div>
   );
 };
