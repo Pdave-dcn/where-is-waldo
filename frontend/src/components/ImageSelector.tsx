@@ -1,7 +1,7 @@
 import { useGameData } from "@/hooks/use-GameData";
 import { Loader } from "./ui/loader";
 import { Button } from "./ui/button";
-import { Card, CardContent } from "./ui/card";
+import { Card, CardContent, CardFooter } from "./ui/card";
 
 // Helper function to generate a Cloudinary thumbnail URL
 const getThumbnailUrl = (
@@ -31,13 +31,8 @@ const getThumbnailUrl = (
 };
 
 const ImageSelector = () => {
-  const {
-    allAvailableImages,
-    selectImage,
-    selectedImageId,
-    allImagesError,
-    allImagesLoading,
-  } = useGameData();
+  const { allAvailableImages, selectImage, allImagesError, allImagesLoading } =
+    useGameData();
 
   if (allImagesLoading) {
     return (
@@ -106,16 +101,12 @@ const ImageSelector = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto mb-8">
           {allAvailableImages.map((option) => (
-            <div
+            <Card
               key={option.id}
-              className={`relative rounded-lg shadow-lg border-4 transition-all duration-200 cursor-pointer transform hover:scale-105 ${
-                selectedImageId === option.id
-                  ? "border-primary ring-4 ring-primary/50"
-                  : "border-transparent hover:border-muted"
-              }`}
+              className={`relative rounded-lg shadow-lg transition-all duration-200 cursor-pointer transform hover:scale-105`}
               onClick={() => selectImage(option.id)}
             >
-              <div className="aspect-video overflow-hidden rounded-t-lg bg-background">
+              <CardContent className="aspect-video">
                 <img
                   src={getThumbnailUrl(
                     option.imageUrl,
@@ -126,14 +117,14 @@ const ImageSelector = () => {
                   className="w-full h-full object-cover"
                   loading="lazy"
                 />
-              </div>
-              <div className="p-4">
+              </CardContent>
+              <CardFooter className="p-4 flex flex-col items-start">
                 <h3 className="font-bold text-lg mb-2">{option.name}</h3>
                 <p className="text-muted-foreground text-sm">
                   {option.description}
                 </p>
-              </div>
-            </div>
+              </CardFooter>
+            </Card>
           ))}
         </div>
       </div>

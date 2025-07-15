@@ -54,7 +54,7 @@ const LeaderboardPage = () => {
         return <Award className="w-6 h-6 text-amber-600" />;
       default:
         return (
-          <span className="w-6 h-6 flex items-center justify-center text-base font-bold text-gray-500">
+          <span className="w-6 h-6 flex items-center justify-center text-base font-bold text-muted-foreground">
             #{rank}
           </span>
         );
@@ -172,7 +172,7 @@ const LeaderboardPage = () => {
                   {leaderboardData.map((entry, index) => (
                     <TableRow
                       key={entry.id}
-                      className={index < 3 ? "bg-yellow-50" : ""}
+                      className={index < 3 ? "bg-yellow-50 dark:bg-accent" : ""}
                     >
                       <TableCell className="flex items-center justify-center py-3">
                         {" "}
@@ -184,7 +184,7 @@ const LeaderboardPage = () => {
                       <TableCell className="font-mono text-green-600 font-semibold text-lg">
                         {formatTime(entry.timeTakenSeconds)}
                       </TableCell>
-                      <TableCell className="text-gray-500 text-base">
+                      <TableCell className="text-muted-foreground text-base">
                         {new Date(entry.completedAt).toLocaleDateString()}
                       </TableCell>
                     </TableRow>

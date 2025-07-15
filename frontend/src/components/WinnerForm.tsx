@@ -46,12 +46,12 @@ const WinnerForm = ({ secondsTaken }: WinnerFormProps) => {
 
   return (
     <div className="fixed inset-0 bg-background/50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg p-8 max-w-md w-full mx-4 shadow-2xl">
+      <div className="bg-background rounded-lg p-8 max-w-md w-full mx-4 shadow-2xl">
         <div className="text-center mb-6">
           <h2 className="text-3xl font-bold text-green-600 mb-2">
             🎉 Congratulations!
           </h2>
-          <p className="text-gray-600 text-lg">
+          <p className="text-secondary-foreground text-lg">
             {`You found ${characterNumber} in: `}
             <span className="font-bold text-green-600">
               {formatTime(secondsTaken)}
@@ -63,7 +63,7 @@ const WinnerForm = ({ secondsTaken }: WinnerFormProps) => {
           <div>
             <label
               htmlFor="playerName"
-              className="block text-sm font-medium text-gray-700 mb-2"
+              className="block text-sm font-medium mb-2"
             >
               Enter your name to save your score:
             </label>
@@ -81,7 +81,7 @@ const WinnerForm = ({ secondsTaken }: WinnerFormProps) => {
           <div className="flex space-x-3">
             <Button
               type="submit"
-              className="flex-1 bg-green-600 hover:bg-green-700 cursor-pointer"
+              className="flex-1 bg-green-600 hover:bg-green-700 text-white cursor-pointer"
               disabled={!name.trim()}
               onClick={() => handleSubmit}
             >

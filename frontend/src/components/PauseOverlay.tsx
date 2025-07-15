@@ -10,9 +10,9 @@ interface PauseOverlayProps {
 const PauseOverlay = ({ onResume, onRestart, onQuit }: PauseOverlayProps) => {
   return (
     <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center">
-      <div className="bg-white rounded-lg p-8 shadow-2xl border-4 text-center max-w-md mx-4">
+      <div className="bg-background rounded-lg p-8 shadow-2xl border-4 text-center max-w-md mx-4">
         <h2 className="text-3xl font-bold text-primary mb-4">Game Paused</h2>
-        <p className="text-gray-600 mb-8 text-lg">
+        <p className="text-secondary-foreground mb-8 text-lg">
           Take a break! The timer is paused.
         </p>
 

@@ -76,12 +76,12 @@ const TargetBox = ({ position, onClose, characterData }: TargetBoxProps) => {
       style={{
         left: `${position.x}px`,
         top: `${position.y}px`,
-        transform: "translate(-25%, -50%)",
+        transform: "translate(-50%, -50%)",
       }}
     >
       <div className="relative">
-        <div className="w-16 h-16 border-4 animate-pulse" />
-        <div className="absolute inset-0 w-16 h-16 border-2" />
+        <div className="w-16 h-16 border-4 border-white animate-pulse" />
+        <div className="absolute inset-0 w-16 h-16 border-2 border-white" />
       </div>
 
       <div className="absolute top-20 left-1/2 transform -translate-x-1/2">
