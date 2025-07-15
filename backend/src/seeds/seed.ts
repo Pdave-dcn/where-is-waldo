@@ -1,4 +1,4 @@
-import prisma from "../config/db";
+import prisma from "../config/db.js";
 const gameData = [
   {
     image: {
@@ -26,8 +26,30 @@ const gameData = [
         toleranceXRatio: 0.0164,
         toleranceYRatio: 0.0262,
       },
+      {
+        characterName: "Wenda",
+        targetXRatio: 0.7651,
+        targetYRatio: 0.5311,
+        toleranceXRatio: 0.0164,
+        toleranceYRatio: 0.0262,
+      },
+      {
+        characterName: "Wizard",
+        targetXRatio: 0.6759,
+        targetYRatio: 0.2918,
+        toleranceXRatio: 0.0164,
+        toleranceYRatio: 0.0262,
+      },
+      {
+        characterName: "Woof",
+        targetXRatio: 0.0982,
+        targetYRatio: 0.519,
+        toleranceXRatio: 0.0327,
+        toleranceYRatio: 0.0525,
+      },
     ],
   },
+
   {
     image: {
       name: "The Siege Begins",
@@ -46,41 +68,6 @@ const gameData = [
         targetYRatio: 0.3581,
         toleranceXRatio: 0.0195,
         toleranceYRatio: 0.0297,
-      },
-      {
-        characterName: "Odlaw",
-        targetXRatio: 0.5537,
-        targetYRatio: 0.9383,
-        toleranceXRatio: 0.0195,
-        toleranceYRatio: 0.0297,
-      },
-    ],
-  },
-  {
-    image: {
-      name: "Storming the Fortress",
-      description:
-        "The walls have been breached, soldiers flooding in, smoke, and mayhem.",
-      imageUrl:
-        "https://res.cloudinary.com/dqpbvnhco/image/upload/v1751762104/battlefield_kwtwdt.jpg",
-      publicId: "battlefield_kwtwdt",
-      originalWidth: 2828,
-      originalHeight: 1828,
-    },
-    characters: [
-      {
-        characterName: "Waldo",
-        targetXRatio: 0.1679,
-        targetYRatio: 0.8449,
-        toleranceXRatio: 0.0141,
-        toleranceYRatio: 0.0219,
-      },
-      {
-        characterName: "Odlaw",
-        targetXRatio: 0.7566,
-        targetYRatio: 0.7619,
-        toleranceXRatio: 0.0141,
-        toleranceYRatio: 0.0219,
       },
     ],
   },

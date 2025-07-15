@@ -13,6 +13,7 @@ import { Loader } from "@/components/ui/loader";
 import { useGameData } from "@/hooks/use-GameData";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useGameProgress } from "@/hooks/use-GameProgress";
 
 const LeaderboardPage = () => {
   const {
@@ -24,11 +25,18 @@ const LeaderboardPage = () => {
     setSelectedImageId,
   } = useGameData();
 
+  const { resetGame } = useGameProgress();
+
   const navigate = useNavigate();
 
   useEffect(() => {
     fetchLeaderboardData();
   }, []);
+
+  const resetGameProgress = () => {
+    setSelectedImageId(null);
+    resetGame();
+  };
 
   const formatTime = (seconds: number) => {
     const minutes = Math.floor(seconds / 60);
@@ -106,7 +114,7 @@ const LeaderboardPage = () => {
           className="flex items-center gap-2 text-lg text-primary hover:text-primary-dark cursor-pointer"
           onClick={() => {
             navigate("/");
-            setSelectedImageId(null);
+            resetGameProgress();
           }}
         >
           <ArrowLeftCircle className="w-6 h-6" />

@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useGameData } from "@/hooks/use-GameData";
+import { useGameProgress } from "@/hooks/use-GameProgress";
 
 interface WinnerFormProps {
   secondsTaken: number | null;
@@ -11,6 +12,15 @@ interface WinnerFormProps {
 const WinnerForm = ({ secondsTaken }: WinnerFormProps) => {
   const [name, setName] = useState("");
   const { createGameCompletion } = useGameData();
+
+  const { totalCharacters, availableCharacters } = useGameProgress();
+
+  const characterNumber =
+    totalCharacters > 1
+      ? `all ${totalCharacters} characters`
+      : availableCharacters.length === 1
+      ? `${availableCharacters[0]}`
+      : "";
 
   const navigate = useNavigate();
 
@@ -42,7 +52,7 @@ const WinnerForm = ({ secondsTaken }: WinnerFormProps) => {
             🎉 Congratulations!
           </h2>
           <p className="text-gray-600 text-lg">
-            You found both Waldo and Odlaw in{" "}
+            {`You found ${characterNumber} in: `}
             <span className="font-bold text-green-600">
               {formatTime(secondsTaken)}
             </span>
