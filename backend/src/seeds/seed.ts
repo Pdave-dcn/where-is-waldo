@@ -133,8 +133,8 @@ const gameData = [
       },
       {
         characterName: "Wizard",
-        targetXRatio: 0.4104,
-        targetYRatio: 0.7615,
+        targetXRatio: 0.4109,
+        targetYRatio: 0.5789,
         toleranceXRatio: 0.0208,
         toleranceYRatio: 0.0367,
       },
