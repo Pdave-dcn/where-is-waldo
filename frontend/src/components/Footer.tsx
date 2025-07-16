@@ -11,6 +11,8 @@ const Footer = ({ resetGame }: FooterProps) => {
   const [showHowToPlay, setShowHowToPlay] = useState(false);
   const [showCredits, setShowCredits] = useState(false);
 
+  const currentYear = new Date().getFullYear();
+
   return (
     <>
       <footer className="bg-background py-8">
@@ -46,8 +48,8 @@ const Footer = ({ resetGame }: FooterProps) => {
 
           <div className="mt-6 text-center text-sm">
             <p className="text-muted-foreground">
-              © 2025 Where's Waldo Game. Built with ❤️ for puzzle lovers
-              everywhere.
+              {`© ${currentYear} Where's Waldo Game. Built with ❤️ for puzzle lovers
+              everywhere.`}
             </p>
           </div>
         </div>
