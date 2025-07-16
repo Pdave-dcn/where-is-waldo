@@ -49,7 +49,6 @@ const gameData = [
       },
     ],
   },
-
   {
     image: {
       name: "The Siege Begins",
@@ -68,6 +67,97 @@ const gameData = [
         targetYRatio: 0.3581,
         toleranceXRatio: 0.0195,
         toleranceYRatio: 0.0297,
+      },
+    ],
+  },
+  {
+    image: {
+      name: "Kick-Off Chaos",
+      description:
+        "Who’s winning? Who knows! With half the town on the pitch and the goal protected like a castle gate, this game is out of control.",
+      imageUrl:
+        "https://res.cloudinary.com/dqpbvnhco/image/upload/v1752625207/kick-off_vs9ggz.jpg",
+      publicId: "kick-off_vs9ggz",
+      originalWidth: 2002,
+      originalHeight: 1278,
+    },
+    characters: [
+      {
+        characterName: "Wizard",
+        targetXRatio: 0.2951,
+        targetYRatio: 0.4233,
+        toleranceXRatio: 0.02,
+        toleranceYRatio: 0.0313,
+      },
+      {
+        characterName: "Waldo",
+        targetXRatio: 0.9605,
+        targetYRatio: 0.061,
+        toleranceXRatio: 0.02,
+        toleranceYRatio: 0.0313,
+      },
+      {
+        characterName: "Odlaw",
+        targetXRatio: 0.9211,
+        targetYRatio: 0.5736,
+        toleranceXRatio: 0.02,
+        toleranceYRatio: 0.0313,
+      },
+      {
+        characterName: "Wenda",
+        targetXRatio: 0.2827,
+        targetYRatio: 0.6673,
+        toleranceXRatio: 0.02,
+        toleranceYRatio: 0.0313,
+      },
+    ],
+  },
+  {
+    image: {
+      name: "Roller Coasters and Roasted Targets",
+      description:
+        "The mechanical horses are bucking, someone’s setting things on fire on purpose, and a pie just flew past your head. Welcome to the wildest amusement park around.",
+      imageUrl:
+        "https://res.cloudinary.com/dqpbvnhco/image/upload/v1752625207/roller-coasters_j89sno.png",
+      publicId: "roller-coasters_j89sno",
+      originalWidth: 1920,
+      originalHeight: 1090,
+    },
+    characters: [
+      {
+        characterName: "Wenda",
+        targetXRatio: 0.099,
+        targetYRatio: 0.7945,
+        toleranceXRatio: 0.0208,
+        toleranceYRatio: 0.0367,
+      },
+      {
+        characterName: "Wizard",
+        targetXRatio: 0.4104,
+        targetYRatio: 0.7615,
+        toleranceXRatio: 0.0208,
+        toleranceYRatio: 0.0367,
+      },
+      {
+        characterName: "Waldo",
+        targetXRatio: 0.7391,
+        targetYRatio: 0.5193,
+        toleranceXRatio: 0.0208,
+        toleranceYRatio: 0.0367,
+      },
+      {
+        characterName: "Odlaw",
+        targetXRatio: 0.5953,
+        targetYRatio: 0.2431,
+        toleranceXRatio: 0.0208,
+        toleranceYRatio: 0.0367,
+      },
+      {
+        characterName: "Woof",
+        targetXRatio: 0.4609,
+        targetYRatio: 0.9128,
+        toleranceXRatio: 0.0417,
+        toleranceYRatio: 0.0734,
       },
     ],
   },
