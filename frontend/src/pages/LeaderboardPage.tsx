@@ -1,4 +1,4 @@
-import { Trophy, Medal, Award, ArrowLeftCircle } from "lucide-react";
+import { Trophy, ArrowLeftCircle } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Table,
@@ -15,6 +15,7 @@ import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useGameProgress } from "@/hooks/use-GameProgress";
 import { motion } from "motion/react";
+import { getRankIcon } from "@/utils/leaderboardUtils";
 
 const LeaderboardPage = () => {
   const {
@@ -43,23 +44,6 @@ const LeaderboardPage = () => {
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = Math.floor(seconds % 60);
     return `${minutes}:${remainingSeconds.toString().padStart(2, "0")}`;
-  };
-
-  const getRankIcon = (rank: number) => {
-    switch (rank) {
-      case 1:
-        return <Trophy className="w-6 h-6 text-yellow-500" />;
-      case 2:
-        return <Medal className="w-6 h-6 text-gray-400" />;
-      case 3:
-        return <Award className="w-6 h-6 text-amber-600" />;
-      default:
-        return (
-          <span className="w-6 h-6 flex items-center justify-center text-base font-bold text-muted-foreground">
-            #{rank}
-          </span>
-        );
-    }
   };
 
   if (!imageData) {

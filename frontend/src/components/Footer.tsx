@@ -1,5 +1,5 @@
-import CreditsModal from "./CreditsModal";
-import HowToPlayModal from "./HowToPlayModal";
+import CreditsModal from "./CreditsModal/CreditsModal";
+import HowToPlayModal from "./HowToPlayModal/HowToPlayModal";
 import { Button } from "./ui/button";
 import { RotateCcw, HelpCircle, Users } from "lucide-react";
 import { useState } from "react";

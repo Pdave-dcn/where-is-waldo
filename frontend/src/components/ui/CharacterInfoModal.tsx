@@ -10,6 +10,7 @@ import { Target, HelpCircle } from "lucide-react";
 import { useGameProgress } from "@/hooks/use-GameProgress";
 import { useState } from "react";
 import { motion } from "motion/react";
+import { getCharacterEmoji } from "@/utils/characterInfoModalUtils";
 
 interface CharacterInfoModalProps {
   isOpen: boolean;
@@ -18,23 +19,6 @@ interface CharacterInfoModalProps {
 export const CharacterInfoModal = ({ isOpen }: CharacterInfoModalProps) => {
   const [open, setOpen] = useState(true);
   const { availableCharacters } = useGameProgress();
-
-  const getCharacterEmoji = (character: string) => {
-    switch (character.toLowerCase()) {
-      case "waldo":
-        return "🔴";
-      case "odlaw":
-        return "🟡";
-      case "wenda":
-        return "🔵";
-      case "woof":
-        return "🐕";
-      case "wizard":
-        return "🧙‍♂️";
-      default:
-        return "❓";
-    }
-  };
 
   return (
     <Dialog open={isOpen && open} onOpenChange={() => {}}>
