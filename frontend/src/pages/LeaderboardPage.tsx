@@ -14,6 +14,7 @@ import { useGameData } from "@/hooks/use-GameData";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useGameProgress } from "@/hooks/use-GameProgress";
+import { motion } from "motion/react";
 
 const LeaderboardPage = () => {
   const {
@@ -109,91 +110,133 @@ const LeaderboardPage = () => {
     <div className="min-h-screen bg-background py-8">
       <div className="max-w-5xl mx-auto px-4 space-y-8">
         {/* Back Button */}
-        <Button
-          variant="ghost"
-          className="flex items-center gap-2 text-lg text-primary hover:text-primary-dark cursor-pointer"
-          onClick={() => {
-            navigate("/");
-            resetGameProgress();
-          }}
+        <motion.div
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.5 }}
+          whileHover={{ x: -5, transition: { duration: 0.2 } }}
         >
-          <ArrowLeftCircle className="w-6 h-6" />
-          Back to Image Selection
-        </Button>
+          <Button
+            variant="ghost"
+            className="flex items-center gap-2 text-lg text-primary hover:text-primary-dark cursor-pointer"
+            onClick={() => {
+              navigate("/");
+              resetGameProgress();
+            }}
+          >
+            <ArrowLeftCircle className="w-6 h-6" />
+            Back to Image Selection
+          </Button>
+        </motion.div>
 
         {/* Game Image Display */}
-        <Card className="overflow-hidden">
-          <CardHeader>
-            <CardTitle className="text-center text-3xl font-bold">
-              Leaderboard for: {imageData?.name}
-            </CardTitle>
-            <p className="text-center text-muted-foreground">
-              {imageData?.description}
-            </p>
-          </CardHeader>
-          <CardContent className="p-0">
-            <div className="relative aspect-video w-full overflow-hidden">
-              <img
-                src={imageData?.url}
-                alt={imageData?.name}
-                className="w-full h-full object-cover"
-                loading="lazy"
-              />
-            </div>
-          </CardContent>
-        </Card>
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9, y: 20 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          transition={{
+            duration: 0.8,
+            delay: 0.2,
+            ease: [0.6, -0.05, 0.01, 0.99],
+          }}
+        >
+          <Card className="overflow-hidden">
+            <CardHeader>
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.5 }}
+              >
+                <CardTitle className="text-center text-3xl font-bold">
+                  Leaderboard for: {imageData?.name}
+                </CardTitle>
+                <p className="text-center text-muted-foreground">
+                  {imageData?.description}
+                </p>
+              </motion.div>
+            </CardHeader>
+            <CardContent className="p-0">
+              <motion.div
+                className="relative aspect-video w-full overflow-hidden"
+                initial={{ opacity: 0, scale: 1.05 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{
+                  duration: 1,
+                  delay: 0.6,
+                  ease: "easeOut",
+                }}
+              >
+                <img
+                  src={imageData?.url}
+                  alt={imageData?.name}
+                  className="w-full h-full object-cover"
+                  loading="lazy"
+                />
+              </motion.div>
+            </CardContent>
+          </Card>
+        </motion.div>
 
         {/* Leaderboard Table */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-3 text-3xl">
-              <Trophy className="w-8 h-8 text-yellow-500" /> Top Players
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {leaderboardData.length === 0 ? (
-              <div className="text-center py-12 text-gray-500">
-                <p className="text-xl font-semibold mb-2">
-                  No scores yet for this image!
-                </p>
-                <p className="text-lg">Be the first to set a record!</p>
-              </div>
-            ) : (
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="w-20 text-center">Rank</TableHead>{" "}
-                    <TableHead>Player Name</TableHead>
-                    <TableHead>Time</TableHead>
-                    <TableHead>Date</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {leaderboardData.map((entry, index) => (
-                    <TableRow
-                      key={entry.id}
-                      className={index < 3 ? "bg-yellow-50 dark:bg-accent" : ""}
-                    >
-                      <TableCell className="flex items-center justify-center py-3">
-                        {" "}
-                        {getRankIcon(index + 1)}
-                      </TableCell>
-                      <TableCell className="font-medium text-lg">
-                        {entry.playerName}
-                      </TableCell>
-                      <TableCell className="font-mono text-green-600 font-semibold text-lg">
-                        {formatTime(entry.timeTakenSeconds)}
-                      </TableCell>
-                      <TableCell className="text-muted-foreground text-base">
-                        {new Date(entry.completedAt).toLocaleDateString()}
-                      </TableCell>
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.8 }}
+        >
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-3 text-3xl">
+                <Trophy className="w-8 h-8 text-yellow-500" /> Top Players
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {leaderboardData.length === 0 ? (
+                <div className="text-center py-12 text-gray-500">
+                  <p className="text-xl font-semibold mb-2">
+                    No scores yet for this image!
+                  </p>
+                  <p className="text-lg">Be the first to set a record!</p>
+                </div>
+              ) : (
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="w-20 text-center">Rank</TableHead>
+                      <TableHead>Player Name</TableHead>
+                      <TableHead>Time</TableHead>
+                      <TableHead>Date</TableHead>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            )}
-          </CardContent>
-        </Card>
+                  </TableHeader>
+                  <TableBody>
+                    {leaderboardData.map((entry, index) => (
+                      <motion.tr
+                        key={entry.id}
+                        className={
+                          index < 3 ? "bg-yellow-50 dark:bg-accent" : ""
+                        }
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.4, delay: index * 0.1 }}
+                      >
+                        <TableCell className="flex items-center justify-center py-3">
+                          {getRankIcon(index + 1)}
+                        </TableCell>
+                        <TableCell className="font-medium text-lg">
+                          {entry.playerName}
+                        </TableCell>
+                        <TableCell className="font-mono text-green-600 font-semibold text-lg">
+                          {formatTime(entry.timeTakenSeconds)}
+                        </TableCell>
+                        <TableCell className="text-muted-foreground text-base">
+                          {new Date(entry.completedAt).toLocaleDateString()}
+                        </TableCell>
+                      </motion.tr>
+                    ))}
+                  </TableBody>
+                </Table>
+              )}
+            </CardContent>
+          </Card>
+        </motion.div>
       </div>
     </div>
   );
