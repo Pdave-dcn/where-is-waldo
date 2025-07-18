@@ -4,13 +4,22 @@ A fun, interactive photo-tagging web app featuring a modern React/TypeScript fro
 
 ---
 
+## 🚀 Live Demo
+
+Coming soon
+
 ## Screenshots
 
 ![Image Selection](./screenshots/image-selection-ui.jpeg)
+
 ![Info Modal](./screenshots/info-modal.png)
+
 ![Game Image](./screenshots/ongoing-game.jpeg)
+
 ![Pause Interface](./screenshots/paused.jpeg)
+
 ![Leaderboard](./screenshots/leaderboard.jpeg)
+
 ![Dark Mode](./screenshots/dark-mode.jpeg)
 
 ---
@@ -104,6 +113,14 @@ npm run dev
 
 - **Code Quality**: ESLint and Prettier are set up to enforce consistent formatting and catch common bugs during development.
 - **Environment Configuration**: Be sure to define required environment variables. For example, `ALLOWED_ORIGIN` must be set to enable proper CORS handling for backend requests.
+
+---
+
+## 📄 License
+
+This project is licensed under the [MIT License](https://opensource.org/licenses/MIT).
+
+You're free to use, modify, and distribute this code — **but please credit the original author by linking back to this repository**.
 
 ---
 
