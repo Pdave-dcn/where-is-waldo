@@ -6,7 +6,7 @@ A fun, interactive photo-tagging web app featuring a modern React/TypeScript fro
 
 ## 🚀 Live Demo
 
-Coming soon
+- <https://whereiswaldoonline.netlify.app/>
 
 ## Screenshots
 
