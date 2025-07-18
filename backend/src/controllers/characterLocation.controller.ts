@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import prisma from "../config/db.js";
 import { z } from "zod";
-import { Prisma } from "@prisma/client";
+import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library.js";
 
 const CharacterLocationSchema = z.object({
   characterName: z.string().min(1, "Character name is required."),
@@ -66,7 +66,7 @@ export const addCharacterLocation = async (req: Request, res: Response) => {
       });
     }
 
-    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+    if (error instanceof PrismaClientKnownRequestError) {
       // Handle Prisma unique constraint violation (e.g., trying to add "Waldo" twice to the same image)
       if (error.code === "P2002") {
         const conflictingCharacterName = req.body?.characterName;

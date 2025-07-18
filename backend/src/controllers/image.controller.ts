@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import prisma from "../config/db.js";
 import { z } from "zod";
-import { Prisma } from "@prisma/client";
+import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library.js";
 
 const ImageIdParamSchema = z.object({
   id: z.string().uuid("Invalid Image ID format in URL parameter."),
@@ -128,7 +128,7 @@ export const getImage = async (req: Request, res: Response) => {
         })),
       });
     }
-    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+    if (error instanceof PrismaClientKnownRequestError) {
       console.error("Prisma Error fetching image:", error.message);
     }
     console.error("Error getting image:", error);
@@ -152,7 +152,7 @@ export const getAllImages = async (_req: Request, res: Response) => {
       images,
     });
   } catch (error: unknown) {
-    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+    if (error instanceof PrismaClientKnownRequestError) {
       console.error("Prisma Error fetching image:", error.message);
     }
 

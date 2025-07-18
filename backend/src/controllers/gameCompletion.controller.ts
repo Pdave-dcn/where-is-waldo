@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { z } from "zod";
-import { Prisma } from "@prisma/client";
+import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library.js";
 import prisma from "../config/db.js";
 
 const ImageIdParamSchema = z.object({
@@ -52,7 +52,7 @@ export const createNewGameCompletion = async (req: Request, res: Response) => {
       });
     }
 
-    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+    if (error instanceof PrismaClientKnownRequestError) {
       // P2003: Foreign key constraint failed (e.g., if gameImageId somehow invalid after check)
       if (error.code === "P2003") {
         return res
