@@ -1,7 +1,7 @@
 import express from "express";
-import router from "./routes/routerIndex.route.js";
+import router from "./routes/index.route.js";
 import cors from "cors";
-import { corsOptions } from "./config/cors.js";
+import { corsOptions } from "./core/config/cors.js";
 
 const PORT = process.env.PORT || 3000;
 
