@@ -1,10 +1,38 @@
 import { Prisma } from "@prisma/client";
-import { Response } from "express";
+import { Request, Response } from "express";
 import DatabaseErrorHandler from "./handlers/database.handler";
 import { ZodError } from "zod";
 import ValidationErrorHandler from "./handlers/validation.handler";
+import { logger } from "../config/logger";
 
 const handleError = (error: unknown, res: Response) => {
+  const req = res.req as
+    | (Request & { logContext?: Record<string, unknown> })
+    | undefined;
+  const contextLogger = logger.child(req?.logContext ?? {});
+
+  const errorType =
+    error instanceof Error ? error.constructor.name : typeof error;
+  const errorMessage =
+    error instanceof Prisma.PrismaClientKnownRequestError ||
+    error instanceof Error
+      ? error.message
+      : String(error);
+
+  contextLogger.error(
+    {
+      errorType,
+      errorDescription: errorMessage,
+      stack:
+        process.env.NODE_ENV === "development"
+          ? error instanceof Error
+            ? error.stack
+            : undefined
+          : undefined,
+    },
+    `Request failed with error (${errorType})`
+  );
+
   let errorResponse;
 
   if (error instanceof Prisma.PrismaClientKnownRequestError) {

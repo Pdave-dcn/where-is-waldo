@@ -3,8 +3,11 @@ import {
   createNewGameCompletion,
   getLeaderboardForImage,
 } from "../controllers/gameCompletion.controller.js";
+import attachLogContext from "../middleware/logContext.middleware.js";
 
 const router = express.Router();
+
+router.use(attachLogContext("GameCompletionRoute"));
 
 router.post(
   "/image/:id/game-completion",

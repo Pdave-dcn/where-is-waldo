@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { toast } from "sonner";
 import debounce from "lodash.debounce";
-import { type ImageData } from "@/contexts/GameDataContext";
+import type { ImageData } from "@/zodSchemas/image.zod";
 
 interface Position {
   x: number;
@@ -15,7 +15,7 @@ export interface CharacterData {
 }
 
 // Custom hook for position calculations
-const useCharacterPositions = (imageData: ImageData | null) => {
+const useCharacterPositions = (imageData: ImageData | null | undefined) => {
   const [characters, setCharacters] = useState<CharacterData[]>([]);
   const imageRef = useRef<HTMLImageElement>(null);
 

@@ -8,6 +8,7 @@ const getGameImages = async () => {
   try {
     const response = await api.get("/images");
     const validatedResponse = AllImagesResponseSchema.parse(response.data);
+
     return validatedResponse.data;
   } catch (error: unknown) {
     console.error("Error fetching game images:", error);

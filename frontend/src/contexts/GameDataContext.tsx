@@ -34,19 +34,6 @@ export interface Leaderboard {
 }
 
 export interface GameDataContextType {
-  imageData: ImageData | null;
-
-  allAvailableImages: AvailableImage[] | null;
-  allImagesLoading: boolean;
-  allImagesError: Error | null;
-
-  selectedImageId: string | null;
-  setSelectedImageId: React.Dispatch<React.SetStateAction<string | null>>;
-
-  selectImage: (imageId: string) => void;
-  selectedImageLoading: boolean;
-  selectedImageError: Error | null;
-
   gameCompletionLoading: boolean;
   gameCompletionError: Error | null;
   createGameCompletion: (secondsTaken: number, playerName: string) => void;

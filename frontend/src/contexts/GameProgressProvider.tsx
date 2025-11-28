@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { GameProgressContext } from "./GameProgressContext";
-import { useGameData } from "@/hooks/use-GameData";
+import { useGameDataStore } from "@/stores/gameData.store";
 
 export const GameProgressProvider = ({
   children,
@@ -13,15 +13,15 @@ export const GameProgressProvider = ({
   const [gameCompleted, setGameCompleted] = useState(false);
   const [totalCharacters, setTotalCharacters] = useState(0);
 
-  const { imageData } = useGameData();
+  const { selectedImageData } = useGameDataStore();
 
   useEffect(() => {
-    if (imageData?.characterLocations) {
-      setTotalCharacters(imageData.characterLocations.length);
+    if (selectedImageData?.characterLocations) {
+      setTotalCharacters(selectedImageData.characterLocations.length);
     } else {
       setTotalCharacters(0);
     }
-  }, [imageData]);
+  }, [selectedImageData]);
 
   useEffect(() => {
     if (totalCharacters > 0 && foundCharacters.size === totalCharacters) {
@@ -30,15 +30,15 @@ export const GameProgressProvider = ({
   }, [foundCharacters, totalCharacters]);
 
   useEffect(() => {
-    if (imageData) {
+    if (selectedImageData) {
       resetGame();
     }
-  }, [imageData]);
+  }, [selectedImageData]);
 
   const markCharacterAsFound = useCallback(
     (charName: string) => {
       if (
-        !imageData?.characterLocations.some(
+        !selectedImageData?.characterLocations.some(
           (char) => char.characterName === charName
         )
       ) {
@@ -52,7 +52,7 @@ export const GameProgressProvider = ({
         return newSet;
       });
     },
-    [imageData]
+    [selectedImageData]
   );
 
   const isCharacterFound = useCallback(
@@ -73,9 +73,10 @@ export const GameProgressProvider = ({
 
   const availableCharacters = useMemo(() => {
     return (
-      imageData?.characterLocations.map((char) => char.characterName) || []
+      selectedImageData?.characterLocations.map((char) => char.characterName) ||
+      []
     );
-  }, [imageData]);
+  }, [selectedImageData]);
 
   const contextValue = useMemo(
     () => ({

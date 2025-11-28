@@ -4,8 +4,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { useEffect, useRef, useState } from "react";
 import Timer from "@/components/Timer";
-import GameImage from "@/components/GameImage";
-import { useGameData } from "@/hooks/use-GameData";
+import GameImage from "@/components/GameImage/GameImage";
 import ImageSelector from "@/components/ImageSelector/ImageSelector";
 import PauseOverlay from "@/components/PauseOverlay";
 import { useNavigate } from "react-router-dom";
@@ -13,6 +12,7 @@ import useGameCompletion from "@/hooks/use-GameCompletion";
 import WinnerForm from "@/components/WinnerForm";
 import { useGameProgress } from "@/hooks/use-GameProgress";
 import { CharacterInfoModal } from "@/components/ui/CharacterInfoModal";
+import { useGameDataStore } from "@/stores/gameData.store";
 
 interface TimerRef {
   reset: () => void;
@@ -38,13 +38,7 @@ const Index = () => {
   const isGameComplete = areAllCharactersFound();
   const navigate = useNavigate();
 
-  // !
-  const {
-    allImagesError,
-    selectedImageError,
-    selectedImageId,
-    setSelectedImageId,
-  } = useGameData();
+  const { selectedImageId, selectImage } = useGameDataStore();
 
   useEffect(() => {
     if (selectedImageId && !gameStarted && !gameEnded) {
@@ -53,11 +47,11 @@ const Index = () => {
   }, [selectedImageId, gameStarted, gameEnded]);
 
   const startGame = () => {
-    if (allImagesError || selectedImageError) {
-      setGameStarted(false);
-      setGameEnded(false);
-      return;
-    }
+    // if (allImagesError || selectedImageError) {
+    //   setGameStarted(false);
+    //   setGameEnded(false);
+    //   return;
+    // }
     setGameStarted(true);
     setGameEnded(false);
   };
@@ -75,7 +69,7 @@ const Index = () => {
   };
 
   const handlePauseQuit = () => {
-    setSelectedImageId(null);
+    selectImage(null);
     navigate("/");
     setIsPaused(false);
     resetGame();

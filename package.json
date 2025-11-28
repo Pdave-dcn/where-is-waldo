@@ -4,5 +4,14 @@
   "workspaces": [
     "backend",
     "frontend"
-  ]
+  ],
+  "scripts": {
+    "start:frontend": "npm --workspace frontend run dev",
+    "start:backend": "npm --workspace backend run dev",
+    "start": "concurrently \"npm run start:backend\" \"npm run start:frontend\"",
+    "db:seed": "npm --workspace backend run db:seed"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
 }
