@@ -6,54 +6,11 @@ import {
   type AvailableImage,
   type Leaderboard,
 } from "./GameDataContext";
-
-const CharacterLocationSchema = z.object({
-  id: z.string(),
-  characterName: z.string(),
-  targetXRatio: z.number(),
-  targetYRatio: z.number(),
-  toleranceXRatio: z.number(),
-  toleranceYRatio: z.number(),
-});
-
-const ImageDataSchema = z.object({
-  id: z.string(),
-  name: z.string(),
-  description: z.string(),
-  url: z.string().url(),
-  originalWidth: z.number().int().positive(),
-  originalHeight: z.number().int().positive(),
-  characterLocations: z.array(CharacterLocationSchema),
-});
-
-const ServerResponseSchema = z.object({
-  message: z.string(),
-  image: ImageDataSchema,
-});
-
-const AvailableImageSchema = z.object({
-  id: z.string(),
-  name: z.string(),
-  imageUrl: z.string().url(),
-  description: z.string(),
-});
-
-const AllImagesResponseSchema = z.object({
-  message: z.string(),
-  images: z.array(AvailableImageSchema),
-});
-
-const LeaderboardSchema = z.object({
-  id: z.string(),
-  playerName: z.string(),
-  timeTakenSeconds: z.number(),
-  completedAt: z.string(),
-});
-
-const LeaderboardResponseSchema = z.object({
-  message: z.string(),
-  leaderboard: z.array(LeaderboardSchema),
-});
+import {
+  AllImagesResponseSchema,
+  ImageResponseSchema,
+} from "@/zodSchemas/image.zod";
+import { LeaderboardResponseSchema } from "@/zodSchemas/leaderboard.zod";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL as string;
 
@@ -103,7 +60,7 @@ export const GameDataProvider = ({
         const rawData = await response.json();
         const validatedResponse = AllImagesResponseSchema.parse(rawData);
 
-        setAllAvailableImages(validatedResponse.images);
+        setAllAvailableImages(validatedResponse.data);
         setAllImagesError(null);
       } catch (error: unknown) {
         console.error("Error fetching game data:", error);
@@ -144,9 +101,9 @@ export const GameDataProvider = ({
       }
 
       const rawData = await response.json();
-      const validatedResponse = ServerResponseSchema.parse(rawData);
+      const validatedResponse = ImageResponseSchema.parse(rawData);
 
-      setImageData(validatedResponse.image);
+      setImageData(validatedResponse.data);
       setSelectedImageError(null);
     } catch (error: unknown) {
       console.error(
@@ -233,7 +190,7 @@ export const GameDataProvider = ({
       const data = await response.json();
       const validatedResponse = LeaderboardResponseSchema.parse(data);
 
-      setLeaderboardData(validatedResponse.leaderboard);
+      setLeaderboardData(validatedResponse.data);
     } catch (error: unknown) {
       console.error("Error fetching leaderboard data:", error);
       if (error instanceof Error) {
