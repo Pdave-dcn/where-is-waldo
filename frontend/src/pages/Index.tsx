@@ -6,7 +6,7 @@ import { useEffect, useRef, useState } from "react";
 import Timer from "@/components/Timer";
 import GameImage from "@/components/GameImage";
 import { useGameData } from "@/hooks/use-GameData";
-import ImageSelector from "@/components/ImageSelector";
+import ImageSelector from "@/components/ImageSelector/ImageSelector";
 import PauseOverlay from "@/components/PauseOverlay";
 import { useNavigate } from "react-router-dom";
 import useGameCompletion from "@/hooks/use-GameCompletion";
@@ -38,6 +38,7 @@ const Index = () => {
   const isGameComplete = areAllCharactersFound();
   const navigate = useNavigate();
 
+  // !
   const {
     allImagesError,
     selectedImageError,

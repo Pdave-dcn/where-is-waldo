@@ -28,6 +28,9 @@ const AllImagesResponseSchema = z.object({
   data: z.array(AvailableImageSchema),
 });
 
+export type GameImage = z.infer<typeof AvailableImageSchema>;
+export type ImageData = z.infer<typeof ImageDataSchema>;
+
 export {
   ImageDataSchema,
   ImageResponseSchema,
