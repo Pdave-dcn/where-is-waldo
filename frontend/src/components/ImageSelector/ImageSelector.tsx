@@ -14,6 +14,7 @@ const ImageSelector = () => {
   const { prefetchImage } = usePrefetchImage();
 
   const handleImageSelect = async (imageId: string) => {
+    console.log("Selected image ID:", imageId);
     selectImage(imageId);
 
     const data = await prefetchImage(imageId);

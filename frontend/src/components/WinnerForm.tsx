@@ -5,12 +5,10 @@ import { Input } from "@/components/ui/input";
 import { useGameData } from "@/hooks/use-GameData";
 import { useGameProgress } from "@/hooks/use-GameProgress";
 import { motion, AnimatePresence } from "motion/react";
+import { useGameMetricsStore } from "@/stores/gameMetrics.store";
 
-interface WinnerFormProps {
-  secondsTaken: number | null;
-}
-
-const WinnerForm = ({ secondsTaken }: WinnerFormProps) => {
+const WinnerForm = () => {
+  const { secondsTaken } = useGameMetricsStore();
   const [name, setName] = useState("");
   const { createGameCompletion } = useGameData();
 

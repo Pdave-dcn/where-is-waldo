@@ -1,110 +1,39 @@
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { useEffect, useRef, useState } from "react";
 import Timer from "@/components/Timer";
 import GameImage from "@/components/GameImage/GameImage";
 import ImageSelector from "@/components/ImageSelector/ImageSelector";
 import PauseOverlay from "@/components/PauseOverlay";
-import { useNavigate } from "react-router-dom";
-import useGameCompletion from "@/hooks/use-GameCompletion";
 import WinnerForm from "@/components/WinnerForm";
-import { useGameProgress } from "@/hooks/use-GameProgress";
-import { CharacterInfoModal } from "@/components/ui/CharacterInfoModal";
+import { StartGameCard } from "@/components/StartGameCard";
+import { GameInstructionsModal } from "@/components/GameInstructionsModal/GameInstructionsModal";
+import { useGameOrchestrator } from "@/hooks/use-gameOrchestrator";
+import { useGameStatusStore } from "@/stores/gameStatus.store";
+import { useGameUIStore } from "@/stores/gameUI.store";
 import { useGameDataStore } from "@/stores/gameData.store";
-
-interface TimerRef {
-  reset: () => void;
-  stop: () => number;
-}
+import { GameActions } from "@/services/gameActions.service";
 
 const Index = () => {
-  const [gameStarted, setGameStarted] = useState(false);
-  const [gameEnded, setGameEnded] = useState(false);
-  const [boxPosition, setBoxPosition] = useState<{
-    x: number;
-    y: number;
-  } | null>(null);
-  const [showDropdown, setShowDropdown] = useState(false);
-  const [isPaused, setIsPaused] = useState(false);
-  const [showInfoModal, setShowInfoModal] = useState(false);
+  const {
+    timerRef,
+    isGameComplete,
+    handleStartGame,
+    handleQuitGame,
+    handleResetGame,
+  } = useGameOrchestrator();
 
-  const timerRef = useRef<TimerRef>(null);
+  const { isActive, isEnded, isPaused } = useGameStatusStore();
+  const { showInfoModal } = useGameUIStore();
+  const { selectedImageId } = useGameDataStore();
 
-  const secondsTaken = useGameCompletion(timerRef, setGameEnded);
-  const { areAllCharactersFound, resetGame: resetGameProgress } =
-    useGameProgress();
-  const isGameComplete = areAllCharactersFound();
-  const navigate = useNavigate();
-
-  const { selectedImageId, selectImage } = useGameDataStore();
-
-  useEffect(() => {
-    if (selectedImageId && !gameStarted && !gameEnded) {
-      setShowInfoModal(true);
-    }
-  }, [selectedImageId, gameStarted, gameEnded]);
-
-  const startGame = () => {
-    // if (allImagesError || selectedImageError) {
-    //   setGameStarted(false);
-    //   setGameEnded(false);
-    //   return;
-    // }
-    setGameStarted(true);
-    setGameEnded(false);
-  };
-
-  const handleTogglePause = () => {
-    setIsPaused(!isPaused);
-    if (!isPaused) {
-      setShowDropdown(false);
-      setBoxPosition(null);
-    }
-  };
-
-  const handlePauseResume = () => {
-    setIsPaused(false);
-  };
-
-  const handlePauseQuit = () => {
-    selectImage(null);
-    navigate("/");
-    setIsPaused(false);
-    resetGame();
-  };
-
-  const resetGame = () => {
-    setGameStarted(false);
-    setGameEnded(false);
-    timerRef.current?.reset();
-    setBoxPosition(null);
-    setShowDropdown(false);
-    setIsPaused(false);
-    resetGameProgress();
-  };
-
-  const handleImageClick = (x: number, y: number) => {
-    if (!gameStarted || gameEnded) return;
-
-    setBoxPosition({ x, y });
-    setShowDropdown(true);
-  };
-
-  const handleTargetBoxClose = () => {
-    setBoxPosition(null);
-    setShowDropdown(false);
-  };
-
-  if (!selectedImageId) {
+  if (!selectedImageId && !isActive()) {
     return (
       <div className="min-h-screen flex flex-col">
         <Header />
         <main className="flex-1">
           <ImageSelector />
         </main>
-        <Footer resetGame={resetGame} />
+        <Footer resetGame={handleResetGame} />
       </div>
     );
   }
@@ -114,59 +43,33 @@ const Index = () => {
       <Header />
       <main className="flex flex-col items-center gap-8 px-5">
         <Timer
-          isRunning={gameStarted && !gameEnded}
+          isRunning={isActive() && !isEnded()}
           ref={timerRef}
-          isPaused={isPaused}
-          onPauseToggle={handleTogglePause}
+          isPaused={isPaused()}
+          onPauseToggle={GameActions.togglePause}
         />
 
         <div className="flex flex-col justify-center items-center w-full mx-auto">
-          {gameStarted ? (
-            <GameImage
-              onImageClick={handleImageClick}
-              gameStarted={gameStarted}
-              boxPosition={boxPosition}
-              onBoxClose={handleTargetBoxClose}
-              showDropdown={showDropdown}
-              isPaused={isPaused}
-            />
+          {isActive() ? (
+            <GameImage onImageClick={GameActions.handleImageClick} />
           ) : (
-            <Card className="w-full max-w-5xl">
-              <CardContent className="text-center py-10">
-                <div className="mb-5">
-                  <h1 className="text-xl sm:text-3xl font-medium mb-2">
-                    Ready to Find Waldo?
-                  </h1>
-                  <p className="text-muted-foreground">
-                    Click on Waldo when you spot him in the crowd!
-                  </p>
-                </div>
-                <Button
-                  onClick={() => startGame()}
-                  className="self-center cursor-pointer sm:text-lg"
-                >
-                  Start game
-                </Button>
-              </CardContent>
-            </Card>
+            <StartGameCard onStartGame={handleStartGame} />
           )}
         </div>
       </main>
-      <Footer resetGame={resetGame} />
+      <Footer resetGame={handleResetGame} />
 
-      {selectedImageId && showInfoModal && (
-        <CharacterInfoModal isOpen={showInfoModal} />
-      )}
+      {showInfoModal && <GameInstructionsModal />}
 
-      {isPaused && (
+      {isPaused() && (
         <PauseOverlay
-          onRestart={resetGame}
-          onResume={handlePauseResume}
-          onQuit={handlePauseQuit}
+          onRestart={handleResetGame}
+          onResume={GameActions.togglePause}
+          onQuit={handleQuitGame}
         />
       )}
 
-      {isGameComplete && <WinnerForm secondsTaken={secondsTaken} />}
+      {isGameComplete && <WinnerForm />}
     </div>
   );
 };

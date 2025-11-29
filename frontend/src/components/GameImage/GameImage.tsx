@@ -1,53 +1,31 @@
 import { Card, CardContent } from "../ui/card";
 import ShimmerSkeleton from "../ShimmerSkeleton";
 import useCharacterPositions from "@/hooks/use-CharacterPositions";
-import { useSingleImageQuery } from "@/queries/image.query";
 import { useGameDataStore } from "@/stores/gameData.store";
-import { GameImageLoadingState } from "./LoadingState";
 import { GameImageErrorState } from "./ErrorState";
 import { GameImageOverlay } from "./GameImageOverlay";
 import { CharacterMarkers } from "./CharacterMarkers";
 import { useCallback, useState } from "react";
 import { toast } from "sonner";
-
-interface Position {
-  x: number;
-  y: number;
-}
+import { useGameStatusStore } from "@/stores/gameStatus.store";
 
 interface GameImageProps {
   onImageClick: (x: number, y: number) => void;
-  gameStarted: boolean;
-  boxPosition: Position | null;
-  onBoxClose: () => void;
-  showDropdown: boolean;
-  isPaused: boolean;
 }
 
-const GameImage = ({
-  onImageClick,
-  gameStarted,
-  boxPosition,
-  onBoxClose,
-  showDropdown,
-  isPaused,
-}: GameImageProps) => {
+const GameImage = ({ onImageClick }: GameImageProps) => {
   const [imageLoaded, setImageLoaded] = useState(false);
 
-  const { selectedImageId, setSelectedImageData } = useGameDataStore();
-  const {
-    data: imageData,
-    isLoading,
-    error,
-  } = useSingleImageQuery(selectedImageId || "");
+  const { selectedImageData, isErrorFetchingImageData, aspectRatio } =
+    useGameDataStore();
 
-  setSelectedImageData(imageData || null);
+  const { characters, imageRef } = useCharacterPositions(selectedImageData);
 
-  const { characters, imageRef } = useCharacterPositions(imageData);
+  const { isActive, isPaused } = useGameStatusStore();
 
   const handleClick = useCallback(
     (event: React.MouseEvent<HTMLImageElement>) => {
-      if (!gameStarted || !imageRef.current) return;
+      if (!isActive() || !imageRef.current) return;
 
       const imageRect = imageRef.current.getBoundingClientRect();
       const x = event.clientX - imageRect.left;
@@ -55,7 +33,7 @@ const GameImage = ({
 
       onImageClick(x, y);
     },
-    [gameStarted, onImageClick, imageRef]
+    [isActive, onImageClick, imageRef]
   );
 
   const handleImageLoad = useCallback(() => {
@@ -69,11 +47,7 @@ const GameImage = ({
     });
   }, []);
 
-  if (isLoading) {
-    return <GameImageLoadingState />;
-  }
-
-  if (error) {
+  if (isErrorFetchingImageData) {
     return (
       <GameImageErrorState
         title="Network Error"
@@ -82,7 +56,7 @@ const GameImage = ({
     );
   }
 
-  if (!imageData) {
+  if (!selectedImageData) {
     return (
       <GameImageErrorState
         title="No Game Data"
@@ -90,8 +64,6 @@ const GameImage = ({
       />
     );
   }
-
-  const aspectRatio = imageData.originalWidth / imageData.originalHeight;
 
   return (
     <Card className="w-full max-w-7xl">
@@ -103,8 +75,8 @@ const GameImage = ({
         <img
           ref={imageRef}
           onClick={handleClick}
-          src={imageData.url}
-          alt={imageData.name}
+          src={selectedImageData.url}
+          alt={selectedImageData.name}
           className={`block w-full h-auto transition-opacity duration-300 ${
             imageLoaded ? "opacity-100" : "opacity-0 absolute inset-0"
           }`}
@@ -115,13 +87,8 @@ const GameImage = ({
 
         {imageLoaded && (
           <>
-            <GameImageOverlay isPaused={isPaused} />
-            <CharacterMarkers
-              characters={characters}
-              boxPosition={boxPosition}
-              showDropdown={showDropdown}
-              onBoxClose={onBoxClose}
-            />
+            <GameImageOverlay isPaused={isPaused()} />
+            <CharacterMarkers characters={characters} />
           </>
         )}
       </CardContent>

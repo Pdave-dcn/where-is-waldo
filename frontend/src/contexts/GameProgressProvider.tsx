@@ -14,8 +14,13 @@ export const GameProgressProvider = ({
   const [totalCharacters, setTotalCharacters] = useState(0);
 
   const { selectedImageData } = useGameDataStore();
+  console.log(
+    "Selected Image Data in GameProgressProvider:",
+    selectedImageData
+  );
 
   useEffect(() => {
+    console.log("Updating total characters based on selected image data");
     if (selectedImageData?.characterLocations) {
       setTotalCharacters(selectedImageData.characterLocations.length);
     } else {
@@ -24,12 +29,14 @@ export const GameProgressProvider = ({
   }, [selectedImageData]);
 
   useEffect(() => {
+    console.log("Checking if game is completed");
     if (totalCharacters > 0 && foundCharacters.size === totalCharacters) {
       setGameCompleted(true);
     }
   }, [foundCharacters, totalCharacters]);
 
   useEffect(() => {
+    console.log("Resetting game progress due to image data change");
     if (selectedImageData) {
       resetGame();
     }
