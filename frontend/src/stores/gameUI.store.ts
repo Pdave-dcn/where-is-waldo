@@ -20,6 +20,11 @@ interface GameUIStore {
   reset: () => void;
 }
 
+/**
+ * Game UI store for managing interactive overlay elements.
+ * Controls the character selection dropdown (position and visibility)
+ * and info modal state during gameplay.
+ */
 export const useGameUIStore = create<GameUIStore>()(
   devtools(
     (set) => ({

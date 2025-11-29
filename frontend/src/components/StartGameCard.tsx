@@ -1,9 +1,7 @@
-// StartGameCard.tsx
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useSingleImageQuery } from "@/queries/image.query";
 import { useGameDataStore } from "@/stores/gameData.store";
-import { useGameProgressStore } from "@/stores/gameProgress.store";
 import { useEffect } from "react";
 
 interface StartGameCardProps {
@@ -14,24 +12,16 @@ export const StartGameCard = ({ onStartGame }: StartGameCardProps) => {
   const { selectedImageId, setSelectedImageData, setIsErrorFetchingImageData } =
     useGameDataStore();
   const { data: imageData, error } = useSingleImageQuery(selectedImageId || "");
-  const { setTotalCharacters } = useGameProgressStore();
 
   useEffect(() => {
     if (imageData) {
       setSelectedImageData(imageData);
-      setTotalCharacters(imageData.characterLocations.length);
     }
 
     if (error) {
       setIsErrorFetchingImageData(true);
     }
-  }, [
-    imageData,
-    setSelectedImageData,
-    setTotalCharacters,
-    error,
-    setIsErrorFetchingImageData,
-  ]);
+  }, [imageData, setSelectedImageData, error, setIsErrorFetchingImageData]);
 
   return (
     <Card className="w-full max-w-5xl">

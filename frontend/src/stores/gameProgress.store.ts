@@ -6,18 +6,22 @@ interface GameProgressState {
   foundCharacters: Set<string>;
   gameCompleted: boolean;
   totalCharacters: number;
+  availableCharacterNames: string[];
 
   // Actions
-  markCharacterAsFound: (
-    charName: string,
-    availableCharacters: string[]
-  ) => void;
+  markCharacterAsFound: (charName: string) => void;
   isCharacterFound: (charName: string) => boolean;
   areAllCharactersFound: () => boolean;
   resetGame: () => void;
   setTotalCharacters: (total: number) => void;
+  setAvailableCharacterNames: (names: string[]) => void;
 }
 
+/**
+ * Game progress store for tracking found characters and completion status.
+ * Manages which characters have been discovered, validates findings against
+ * available characters, and determines when all characters are found.
+ */
 export const useGameProgressStore = create<GameProgressState>()(
   devtools(
     (set, get) => ({
@@ -25,10 +29,15 @@ export const useGameProgressStore = create<GameProgressState>()(
       foundCharacters: new Set(),
       gameCompleted: false,
       totalCharacters: 0,
+      availableCharacterNames: [],
+
+      setAvailableCharacterNames: (names) => {
+        set({ availableCharacterNames: names });
+      },
 
       // Actions
-      markCharacterAsFound: (charName, availableCharacters) => {
-        if (!availableCharacters.includes(charName)) {
+      markCharacterAsFound: (charName) => {
+        if (!get().availableCharacterNames.includes(charName)) {
           console.warn(
             `Character "${charName}" not found in current image data`
           );

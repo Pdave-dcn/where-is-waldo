@@ -1,22 +1,25 @@
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
-import { useGameProgress } from "./use-GameProgress";
+import { useGameProgressStore } from "@/stores/gameProgress.store";
+import { useGameDataStore } from "@/stores/gameData.store";
 
 const useGameCompletion = (
   timerRef: React.RefObject<{ stop: () => number; reset: () => void } | null>,
   setGameEnded: React.Dispatch<React.SetStateAction<boolean>>
 ) => {
   const [secondsTaken, setSecondsTaken] = useState<number | null>(null);
-  const { areAllCharactersFound, totalCharacters, availableCharacters } =
-    useGameProgress();
+
+  const { totalCharacters, availableCharacterNames } = useGameDataStore();
+
+  const { areAllCharactersFound } = useGameProgressStore();
 
   const isGameComplete = areAllCharactersFound();
 
   const characterNumber =
     totalCharacters > 1
       ? `all ${totalCharacters} characters`
-      : availableCharacters.length === 1
-      ? `${availableCharacters[0]}`
+      : availableCharacterNames.length === 1
+      ? `${availableCharacterNames[0]}`
       : "";
 
   useEffect(() => {

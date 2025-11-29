@@ -57,16 +57,36 @@ export const useGameOrchestrator = () => {
   const timerRef = useRef<TimerRef>(null);
   const navigate = useNavigate();
 
-  const { selectedImageId, selectImage, isErrorFetchingImageData } =
-    useGameDataStore();
+  const {
+    selectImage,
+    selectedImageId,
+    isErrorFetchingImageData,
+    totalCharacters,
+    availableCharacterNames,
+  } = useGameDataStore();
 
   const { isIdle } = useGameStatusStore();
   const { setShowInfoModal } = useGameUIStore();
   const { setSecondsTaken } = useGameMetricsStore();
-  const { areAllCharactersFound } = useGameProgressStore();
+  const {
+    areAllCharactersFound,
+    setTotalCharacters,
+    setAvailableCharacterNames,
+  } = useGameProgressStore();
 
   const secondsTaken = useGameCompletion(timerRef, GameActions.endGame);
   const isGameComplete = areAllCharactersFound();
+
+  // Sync total characters and available names to store
+  useEffect(() => {
+    setTotalCharacters(totalCharacters);
+    setAvailableCharacterNames(availableCharacterNames);
+  }, [
+    totalCharacters,
+    availableCharacterNames,
+    setTotalCharacters,
+    setAvailableCharacterNames,
+  ]);
 
   // Sync timer to store
   useEffect(() => {

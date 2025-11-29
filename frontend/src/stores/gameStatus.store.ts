@@ -9,7 +9,7 @@ interface GameStatusStore {
   // Pure state mutations only
   setStatus: (status: GameStatus) => void;
 
-  // Computed helpers (no side effects)
+  // Computed helpers
   isIdle: () => boolean;
   isRunning: () => boolean;
   isPaused: () => boolean;
@@ -17,6 +17,11 @@ interface GameStatusStore {
   isActive: () => boolean;
 }
 
+/**
+ * Game status store for managing the current game state lifecycle.
+ * Tracks whether the game is idle, running, paused, or ended, with
+ * computed helpers for checking the current status.
+ */
 export const useGameStatusStore = create<GameStatusStore>()(
   devtools(
     (set, get) => ({

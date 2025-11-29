@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import CharacterDropdown from "./CharacterDropdown";
 import { toast } from "sonner";
 import { type CharacterData } from "@/hooks/use-CharacterPositions";
-import { useGameProgress } from "@/hooks/use-GameProgress";
+import { useGameProgressStore } from "@/stores/gameProgress.store";
 
 interface Position {
   x: number;
@@ -18,7 +18,7 @@ interface TargetBoxProps {
 const TargetBox = ({ position, onClose, characterData }: TargetBoxProps) => {
   const [isVisible, setIsVisible] = useState(false);
   const targetRef = useRef<HTMLDivElement>(null);
-  const { markCharacterAsFound } = useGameProgress();
+  const { markCharacterAsFound } = useGameProgressStore();
 
   useEffect(() => {
     setIsVisible(true);

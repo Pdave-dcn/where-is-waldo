@@ -50,37 +50,3 @@ export const createNewGameCompletion = async (req: Request, res: Response) => {
     return handleError(error, res);
   }
 };
-
-export const getLeaderboardForImage = async (req: Request, res: Response) => {
-  try {
-    const { id: imageId } = ImageIdParamSchema.parse(req.params);
-
-    const image = await prisma.image.findUnique({
-      where: { id: imageId },
-    });
-    if (!image) {
-      return res.status(404).json({ message: "Game image not found." });
-    }
-
-    const leaderboard = await prisma.gameCompletion.findMany({
-      where: { imageId },
-      select: {
-        id: true,
-        playerName: true,
-        timeTakenSeconds: true,
-        completedAt: true,
-      },
-      orderBy: {
-        timeTakenSeconds: "asc",
-      },
-      take: 10,
-    });
-
-    res.status(200).json({
-      message: "Leaderboard retrieved successfully",
-      data: leaderboard,
-    });
-  } catch (error: unknown) {
-    return handleError(error, res);
-  }
-};

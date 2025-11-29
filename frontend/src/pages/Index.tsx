@@ -1,10 +1,10 @@
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
+import Header from "@/components/Layout/Header";
+import Footer from "@/components/Layout/Footer";
 import Timer from "@/components/Timer";
 import GameImage from "@/components/GameImage/GameImage";
 import ImageSelector from "@/components/ImageSelector/ImageSelector";
 import PauseOverlay from "@/components/PauseOverlay";
-import WinnerForm from "@/components/WinnerForm";
+import WinnerForm from "@/components/WinnerFormModal/WinnerForm";
 import { StartGameCard } from "@/components/StartGameCard";
 import { GameInstructionsModal } from "@/components/GameInstructionsModal/GameInstructionsModal";
 import { useGameOrchestrator } from "@/hooks/use-gameOrchestrator";
@@ -50,7 +50,7 @@ const Index = () => {
         />
 
         <div className="flex flex-col justify-center items-center w-full mx-auto">
-          {isActive() ? (
+          {isActive() || isEnded() ? (
             <GameImage onImageClick={GameActions.handleImageClick} />
           ) : (
             <StartGameCard onStartGame={handleStartGame} />

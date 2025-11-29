@@ -10,6 +10,11 @@ interface GameMetricsStore {
   reset: () => void;
 }
 
+/**
+ * Game metrics store for tracking performance and timing data.
+ * Records when the game started and total time taken to complete,
+ * used for displaying results and leaderboard entries.
+ */
 export const useGameMetricsStore = create<GameMetricsStore>()(
   devtools(
     (set) => ({

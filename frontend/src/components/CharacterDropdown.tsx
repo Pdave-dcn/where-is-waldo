@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { ChevronDown } from "lucide-react";
-import { useGameProgress } from "@/hooks/use-GameProgress";
+import { useGameDataStore } from "@/stores/gameData.store";
 
 interface CharacterDropdownProps {
   onCharacterClick: (character: string) => void;
@@ -9,9 +9,8 @@ interface CharacterDropdownProps {
 const CharacterDropdown = ({ onCharacterClick }: CharacterDropdownProps) => {
   const [isOpen, setIsOpen] = useState(true);
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const { availableCharacters } = useGameProgress();
 
-  const characters = availableCharacters ?? [];
+  const { availableCharacterNames } = useGameDataStore();
 
   // Effect to handle clicking outside the dropdown to close it
   useEffect(() => {
@@ -60,7 +59,7 @@ const CharacterDropdown = ({ onCharacterClick }: CharacterDropdownProps) => {
 
       {isOpen && (
         <div className="absolute top-full left-0 mt-1 w-full bg-background rounded-md shadow-lg py-1 z-20">
-          {characters.map((character) => (
+          {availableCharacterNames.map((character) => (
             <div
               key={character}
               onClick={() => handleItemClick(character)}

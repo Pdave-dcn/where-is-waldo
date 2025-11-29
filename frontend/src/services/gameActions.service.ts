@@ -2,6 +2,7 @@ import { useGameStatusStore } from "@/stores/gameStatus.store";
 import { useGameUIStore } from "@/stores/gameUI.store";
 import { useGameMetricsStore } from "@/stores/gameMetrics.store";
 import { useGameProgressStore } from "@/stores/gameProgress.store";
+import { useGameDataStore } from "@/stores/gameData.store";
 
 /**
  * Game action service that coordinates business logic across multiple stores.
@@ -152,11 +153,13 @@ export const GameActions = {
    * ```
    */
   resetGame: () => {
+    const { reset: resetGameData } = useGameDataStore.getState();
     const { setStatus } = useGameStatusStore.getState();
     const { reset: resetUI } = useGameUIStore.getState();
     const { reset: resetMetrics } = useGameMetricsStore.getState();
     const { resetGame: resetProgress } = useGameProgressStore.getState();
 
+    resetGameData();
     setStatus("IDLE");
     resetUI();
     resetMetrics();

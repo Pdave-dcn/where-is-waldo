@@ -1,9 +1,9 @@
 import type { CharacterData } from "@/hooks/use-CharacterPositions";
 import FoundMark from "../FoundMark";
 import TargetBox from "../TargetBox";
-import { useGameProgress } from "@/hooks/use-GameProgress";
 import { useGameUIStore } from "@/stores/gameUI.store";
 import { GameActions } from "@/services/gameActions.service";
+import { useGameProgressStore } from "@/stores/gameProgress.store";
 
 interface CharacterMarkersProps {
   characters: CharacterData[];
@@ -11,7 +11,8 @@ interface CharacterMarkersProps {
 
 export const CharacterMarkers = ({ characters }: CharacterMarkersProps) => {
   const { boxPosition, showDropdown } = useGameUIStore();
-  const { isCharacterFound } = useGameProgress();
+
+  const { isCharacterFound } = useGameProgressStore();
 
   return (
     <>
