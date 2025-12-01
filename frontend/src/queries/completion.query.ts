@@ -13,9 +13,9 @@ export const useCompletionMutation = () => {
       playerData: { timeTakenSeconds: number; playerName: string };
       selectedImageId: string;
     }) => {
-      createGameCompletion(playerData, selectedImageId);
+      const result = await createGameCompletion(playerData, selectedImageId);
 
-      return { selectedImageId };
+      return { selectedImageId, result };
     },
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     onSuccess: (data, _vars, _context) => {
