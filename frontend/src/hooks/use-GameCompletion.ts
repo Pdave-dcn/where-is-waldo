@@ -1,16 +1,17 @@
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { toast } from "sonner";
 import { useGameProgressStore } from "@/stores/gameProgress.store";
 import { useGameDataStore } from "@/stores/gameData.store";
+import { GameActions } from "@/services/gameActions.service";
 
-const useGameCompletion = (
-  timerRef: React.RefObject<{ stop: () => number; reset: () => void } | null>,
-  setGameEnded: React.Dispatch<React.SetStateAction<boolean>>
-) => {
-  const [secondsTaken, setSecondsTaken] = useState<number>(0);
-
+/**
+ * Monitors game completion and triggers end game flow.
+ *
+ * Watches for all characters to be found, then displays a success toast
+ * and automatically ends the game session.
+ */
+const useGameCompletion = () => {
   const { totalCharacters, availableCharacterNames } = useGameDataStore();
-
   const { areAllCharactersFound } = useGameProgressStore();
 
   const isGameComplete = areAllCharactersFound();
@@ -27,13 +28,10 @@ const useGameCompletion = (
       toast.success("Game complete", {
         description: `You've found ${characterNumber} successfully!!`,
       });
-      const time = timerRef.current?.stop();
-      setSecondsTaken(time ?? 0);
-      setGameEnded(true);
-    }
-  }, [isGameComplete, characterNumber, timerRef, setGameEnded]);
 
-  return secondsTaken;
+      GameActions.endGame();
+    }
+  }, [isGameComplete, characterNumber]);
 };
 
 export default useGameCompletion;

@@ -14,13 +14,8 @@ import { useGameDataStore } from "@/stores/gameData.store";
 import { GameActions } from "@/services/gameActions.service";
 
 const Index = () => {
-  const {
-    timerRef,
-    isGameComplete,
-    handleStartGame,
-    handleQuitGame,
-    handleResetGame,
-  } = useGameOrchestrator();
+  const { isGameComplete, handleStartGame, handleQuitGame, handleResetGame } =
+    useGameOrchestrator();
 
   const { isActive, isEnded, isPaused } = useGameStatusStore();
   const { showInfoModal } = useGameUIStore();
@@ -42,12 +37,7 @@ const Index = () => {
     <div className="flex flex-col gap-8 bg-accent">
       <Header />
       <main className="flex flex-col items-center gap-8 px-5">
-        <Timer
-          isRunning={isActive() && !isEnded()}
-          ref={timerRef}
-          isPaused={isPaused()}
-          onPauseToggle={GameActions.togglePause}
-        />
+        <Timer />
 
         <div className="flex flex-col justify-center items-center w-full mx-auto">
           {isActive() || isEnded() ? (

@@ -1,17 +1,11 @@
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useGameDataStore } from "@/stores/gameData.store";
 import { GameActions } from "@/services/gameActions.service";
 import useGameCompletion from "@/hooks/use-GameCompletion";
 import { useGameStatusStore } from "@/stores/gameStatus.store";
 import { useGameUIStore } from "@/stores/gameUI.store";
-import { useGameMetricsStore } from "@/stores/gameMetrics.store";
 import { useGameProgressStore } from "@/stores/gameProgress.store";
-
-interface TimerRef {
-  reset: () => void;
-  stop: () => number;
-}
 
 /**
  * Game orchestrator hook that coordinates game state, side effects, and navigation.
@@ -21,16 +15,13 @@ interface TimerRef {
  * Should be used at the top level of the game component (e.g., Index page).
  *
  * @remarks
- * - Syncs timer state to the metrics store and global store
  * - Shows info modal when a new image is selected
  * - Handles navigation and cleanup on game quit
- * - Coordinates timer ref with game completion tracking
  *
  * @example
  * ```tsx
  * function GamePage() {
  *   const {
- *     timerRef,
  *     isGameComplete,
  *     handleStartGame,
  *     handleQuitGame,
@@ -39,7 +30,6 @@ interface TimerRef {
  *
  *   return (
  *     <div>
- *       <Timer ref={timerRef} />
  *       <Button onClick={handleStartGame}>Start</Button>
  *     </div>
  *   );
@@ -47,14 +37,12 @@ interface TimerRef {
  * ```
  *
  * @returns An object containing:
- * - `timerRef` - React ref for controlling the game timer
  * - `isGameComplete` - Boolean indicating if all characters have been found
  * - `handleStartGame` - Function to start a new game session
  * - `handleQuitGame` - Function to quit current game and navigate to image selection
  * - `handleResetGame` - Function to reset game state and timer
  */
 export const useGameOrchestrator = () => {
-  const timerRef = useRef<TimerRef>(null);
   const navigate = useNavigate();
 
   const {
@@ -67,21 +55,15 @@ export const useGameOrchestrator = () => {
 
   const { isIdle } = useGameStatusStore();
   const { setShowInfoModal } = useGameUIStore();
-  const { setSecondsTaken, setTimerRef } = useGameMetricsStore();
   const {
     areAllCharactersFound,
     setTotalCharacters,
     setAvailableCharacterNames,
   } = useGameProgressStore();
 
-  const secondsTaken = useGameCompletion(timerRef, GameActions.endGame);
-  const isGameComplete = areAllCharactersFound();
+  useGameCompletion();
 
-  // Store timer ref globally so GameActions can access it
-  useEffect(() => {
-    setTimerRef(timerRef.current);
-    return () => setTimerRef(null);
-  }, [setTimerRef]);
+  const isGameComplete = areAllCharactersFound();
 
   // Sync total characters and available names to store
   useEffect(() => {
@@ -93,11 +75,6 @@ export const useGameOrchestrator = () => {
     setTotalCharacters,
     setAvailableCharacterNames,
   ]);
-
-  // Sync timer to store
-  useEffect(() => {
-    setSecondsTaken(secondsTaken || 0);
-  }, [secondsTaken, setSecondsTaken]);
 
   // Show modal when image selected
   useEffect(() => {
@@ -125,7 +102,6 @@ export const useGameOrchestrator = () => {
   };
 
   return {
-    timerRef,
     isGameComplete,
     handleStartGame,
     handleQuitGame,

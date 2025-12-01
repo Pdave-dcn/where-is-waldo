@@ -3,6 +3,7 @@ import { useGameUIStore } from "@/stores/gameUI.store";
 import { useGameMetricsStore } from "@/stores/gameMetrics.store";
 import { useGameProgressStore } from "@/stores/gameProgress.store";
 import { useGameDataStore } from "@/stores/gameData.store";
+import { useTimerStore } from "@/stores/gameTimer.store";
 
 /**
  * Game action service that coordinates business logic across multiple stores.
@@ -50,6 +51,7 @@ export const GameActions = {
     const { setStartTime } = useGameMetricsStore.getState();
 
     setStatus("RUNNING");
+    useTimerStore.getState().start();
     setStartTime(Date.now());
   },
 
@@ -70,6 +72,7 @@ export const GameActions = {
 
     if (isRunning()) {
       setStatus("PAUSED");
+      useTimerStore.getState().pause();
       closeDropdown();
     }
   },
@@ -90,6 +93,7 @@ export const GameActions = {
 
     if (isPaused()) {
       setStatus("RUNNING");
+      useTimerStore.getState().resume();
     }
   },
 
@@ -117,19 +121,31 @@ export const GameActions = {
   },
 
   /**
-   * Ends the current game session.
+   * Finalizes the current game session.
    *
-   * Sets the game status to ENDED. This is typically called automatically
-   * when all characters are found or time expires.
+   * Stops the global timer, records the final time in the metrics store,
+   * and transitions the game state to `ENDED`. This action acts as the
+   * authoritative ending point for any game session.
+   *
+   * Typically invoked automatically when all characters have been found,
+   * but can also be called directly from UI controls or game flow logic.
+   *
+   * @remarks
+   * - Captures and stores the player's total time (`secondsTaken`)
+   * - Stops and cleans up the global timer interval
+   * - Sets the game status to `ENDED`
+   * - Does **not** reset any data — use `resetGame()` for a full reset
    *
    * @example
-   * ```typescript
+   * ```ts
    * if (allCharactersFound) {
    *   GameActions.endGame();
    * }
    * ```
    */
   endGame: () => {
+    const time = useTimerStore.getState().stop();
+    useGameMetricsStore.getState().setSecondsTaken(time);
     const { setStatus } = useGameStatusStore.getState();
     setStatus("ENDED");
   },
@@ -158,15 +174,15 @@ export const GameActions = {
     const { reset: resetGameData } = useGameDataStore.getState();
     const { setStatus } = useGameStatusStore.getState();
     const { reset: resetUI } = useGameUIStore.getState();
-    const { reset: resetMetrics, timerRef } = useGameMetricsStore.getState();
+    const { reset: resetMetrics } = useGameMetricsStore.getState();
     const { resetGame: resetProgress } = useGameProgressStore.getState();
 
     resetGameData();
+    useTimerStore.getState().reset();
     setStatus("IDLE");
     resetUI();
     resetMetrics();
     resetProgress();
-    timerRef?.reset();
   },
 
   /**
@@ -182,13 +198,13 @@ export const GameActions = {
    */
   restartGame: () => {
     const { setStatus } = useGameStatusStore.getState();
-    const { reset: resetMetrics, timerRef } = useGameMetricsStore.getState();
+    const { reset: resetMetrics } = useGameMetricsStore.getState();
     const { resetGame: resetProgress } = useGameProgressStore.getState();
 
+    useTimerStore.getState().reset();
     setStatus("IDLE");
     resetMetrics();
     resetProgress();
-    timerRef?.reset();
   },
 
   /**
