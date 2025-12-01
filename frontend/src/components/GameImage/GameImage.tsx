@@ -8,18 +8,17 @@ import { CharacterMarkers } from "./CharacterMarkers";
 import { useCallback, useState } from "react";
 import { toast } from "sonner";
 import { useGameStatusStore } from "@/stores/gameStatus.store";
+import { GameActions } from "@/services/gameActions.service";
+import TargetBox from "../TargetBox";
 
-interface GameImageProps {
-  onImageClick: (x: number, y: number) => void;
-}
-
-const GameImage = ({ onImageClick }: GameImageProps) => {
+const GameImage = () => {
   const [imageLoaded, setImageLoaded] = useState(false);
 
   const { selectedImageData, isErrorFetchingImageData, aspectRatio } =
     useGameDataStore();
 
-  const { characterPositions, imageRef } = useCharacterPositions();
+  const { characterPositions: characterData, imageRef } =
+    useCharacterPositions();
 
   const { isActive, isPaused } = useGameStatusStore();
 
@@ -31,9 +30,9 @@ const GameImage = ({ onImageClick }: GameImageProps) => {
       const x = event.clientX - imageRect.left;
       const y = event.clientY - imageRect.top;
 
-      onImageClick(x, y);
+      GameActions.handleImageClick(x, y);
     },
-    [isActive, onImageClick, imageRef]
+    [isActive, imageRef]
   );
 
   const handleImageLoad = useCallback(() => {
@@ -88,7 +87,8 @@ const GameImage = ({ onImageClick }: GameImageProps) => {
         {imageLoaded && (
           <>
             <GameImageOverlay isPaused={isPaused()} />
-            <CharacterMarkers characters={characterPositions} />
+            <CharacterMarkers characterData={characterData} />
+            <TargetBox characterData={characterData} />
           </>
         )}
       </CardContent>

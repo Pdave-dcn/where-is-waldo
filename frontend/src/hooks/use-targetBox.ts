@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useRef } from "react";
 import { toast } from "sonner";
 import { type CharacterData } from "@/hooks/use-CharacterPositions";
 import { useGameProgressStore } from "@/stores/gameProgress.store";
@@ -15,30 +15,10 @@ interface UseTargetBoxProps {
 }
 
 export const useTargetBox = ({ characterData }: UseTargetBoxProps) => {
-  const [isVisible, setIsVisible] = useState(false);
   const targetRef = useRef<HTMLDivElement>(null);
 
   const { boxPosition } = useGameUIStore();
   const { markCharacterAsFound } = useGameProgressStore();
-
-  useEffect(() => {
-    setIsVisible(true);
-
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        targetRef.current &&
-        !targetRef.current.contains(event.target as Node)
-      ) {
-        GameActions.closeTargetBox();
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
 
   const isPositionCorrect = (
     clickPosition: Position,
@@ -80,7 +60,6 @@ export const useTargetBox = ({ characterData }: UseTargetBoxProps) => {
   };
 
   return {
-    isVisible,
     targetRef,
     onCharacterClick,
     boxPosition,

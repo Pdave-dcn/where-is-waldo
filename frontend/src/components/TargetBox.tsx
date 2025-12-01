@@ -1,4 +1,4 @@
-import CharacterDropdown from "./CharacterDropdown";
+import CharacterList from "./CharacterList";
 import { type CharacterData } from "@/hooks/use-CharacterPositions";
 import { useTargetBox } from "@/hooks/use-targetBox";
 
@@ -8,7 +8,6 @@ interface TargetBoxProps {
 
 const TargetBox = ({ characterData }: TargetBoxProps) => {
   const {
-    isVisible,
     targetRef,
     onCharacterClick,
     boxPosition: position,
@@ -20,7 +19,7 @@ const TargetBox = ({ characterData }: TargetBoxProps) => {
     <div
       ref={targetRef}
       className={`absolute z-50 transition-all duration-200 ${
-        isVisible ? "opacity-100 scale-100" : "opacity-0 scale-95"
+        position ? "opacity-100 scale-100" : "opacity-0 scale-95"
       }`}
       style={{
         left: `${position?.x}px`,
@@ -34,7 +33,7 @@ const TargetBox = ({ characterData }: TargetBoxProps) => {
       </div>
 
       <div className="absolute top-20 left-1/2 transform -translate-x-1/2">
-        <CharacterDropdown onCharacterClick={onCharacterClick} />
+        <CharacterList onCharacterClick={onCharacterClick} />
       </div>
     </div>
   );

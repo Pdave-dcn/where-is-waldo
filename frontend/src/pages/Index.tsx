@@ -41,7 +41,7 @@ const Index = () => {
 
         <div className="flex flex-col justify-center items-center w-full mx-auto">
           {isActive() || isEnded() ? (
-            <GameImage onImageClick={GameActions.handleImageClick} />
+            <GameImage />
           ) : (
             <StartGameCard onStartGame={handleStartGame} />
           )}

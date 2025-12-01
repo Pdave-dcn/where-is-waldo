@@ -68,12 +68,12 @@ export const GameActions = {
    */
   pauseGame: () => {
     const { isRunning, setStatus } = useGameStatusStore.getState();
-    const { closeDropdown } = useGameUIStore.getState();
+    const { setBoxPosition } = useGameUIStore.getState();
 
     if (isRunning()) {
       setStatus("PAUSED");
       useTimerStore.getState().pause();
-      closeDropdown();
+      setBoxPosition(null);
     }
   },
 
@@ -226,17 +226,17 @@ export const GameActions = {
    */
   handleImageClick: (x: number, y: number) => {
     const { isRunning } = useGameStatusStore.getState();
-    const { openDropdownAt } = useGameUIStore.getState();
+    const { setBoxPosition } = useGameUIStore.getState();
 
     if (isRunning()) {
-      openDropdownAt(x, y);
+      setBoxPosition({ x, y });
     }
   },
 
   /**
-   * Closes the character selection target box/dropdown.
+   * Closes the character selection target box.
    *
-   * Clears both the dropdown visibility and the stored box position.
+   * Clears both the character list visibility and the stored box position.
    * Safe to call even if no dropdown is currently open.
    *
    * @example
@@ -245,7 +245,7 @@ export const GameActions = {
    * ```
    */
   closeTargetBox: () => {
-    const { closeDropdown } = useGameUIStore.getState();
-    closeDropdown();
+    const { setBoxPosition } = useGameUIStore.getState();
+    setBoxPosition(null);
   },
 };
