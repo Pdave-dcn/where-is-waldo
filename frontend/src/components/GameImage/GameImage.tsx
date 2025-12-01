@@ -19,7 +19,7 @@ const GameImage = ({ onImageClick }: GameImageProps) => {
   const { selectedImageData, isErrorFetchingImageData, aspectRatio } =
     useGameDataStore();
 
-  const { characters, imageRef } = useCharacterPositions(selectedImageData);
+  const { characterPositions, imageRef } = useCharacterPositions();
 
   const { isActive, isPaused } = useGameStatusStore();
 
@@ -88,7 +88,7 @@ const GameImage = ({ onImageClick }: GameImageProps) => {
         {imageLoaded && (
           <>
             <GameImageOverlay isPaused={isPaused()} />
-            <CharacterMarkers characters={characters} />
+            <CharacterMarkers characters={characterPositions} />
           </>
         )}
       </CardContent>

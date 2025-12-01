@@ -7,7 +7,7 @@ const useGameCompletion = (
   timerRef: React.RefObject<{ stop: () => number; reset: () => void } | null>,
   setGameEnded: React.Dispatch<React.SetStateAction<boolean>>
 ) => {
-  const [secondsTaken, setSecondsTaken] = useState<number | null>(null);
+  const [secondsTaken, setSecondsTaken] = useState<number>(0);
 
   const { totalCharacters, availableCharacterNames } = useGameDataStore();
 
@@ -28,7 +28,7 @@ const useGameCompletion = (
         description: `You've found ${characterNumber} successfully!!`,
       });
       const time = timerRef.current?.stop();
-      setSecondsTaken(time ?? null);
+      setSecondsTaken(time ?? 0);
       setGameEnded(true);
     }
   }, [isGameComplete, characterNumber, timerRef, setGameEnded]);

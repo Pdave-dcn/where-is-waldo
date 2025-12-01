@@ -11,7 +11,6 @@ const useImagesQuery = () => {
 };
 
 const useSingleImageQuery = (imageId: string) => {
-  console.log("Fetching image with ID:", imageId);
   return useQuery({
     queryKey: ["image", imageId],
     queryFn: () => getImageById(imageId),

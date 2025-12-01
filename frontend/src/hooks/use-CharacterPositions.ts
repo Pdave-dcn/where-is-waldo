@@ -1,7 +1,11 @@
-import { useState, useEffect, useCallback, useMemo, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { toast } from "sonner";
-import debounce from "lodash.debounce";
-import type { ImageData } from "@/zodSchemas/image.zod";
+import { useGameDataStore } from "@/stores/gameData.store";
+import {
+  scaleCharacterPositions,
+  validateImageData,
+} from "@/utils/gameImage.util";
+import { useResizeObserver } from "./use-resizeObserver";
 
 interface Position {
   x: number;
@@ -14,104 +18,71 @@ export interface CharacterData {
   tolerance: Position;
 }
 
-// Custom hook for position calculations
-const useCharacterPositions = (imageData: ImageData | null | undefined) => {
-  const [characters, setCharacters] = useState<CharacterData[]>([]);
+/**
+ * Calculates and maintains scaled character positions based on image dimensions.
+ *
+ * Automatically recalculates positions when the image loads or window resizes,
+ * converting original coordinate ratios to pixel positions that match the
+ * currently displayed image size.
+ *
+ * @returns Object containing scaled character positions and image ref to attach
+ *
+ * @example
+ * ```tsx
+ * const { characterPositions, imageRef } = useCharacterPositions();
+ *
+ * <img ref={imageRef} src={gameSrc} />
+ * {characterPositions.map(char => (
+ *   <Marker position={char.position} tolerance={char.tolerance} />
+ * ))}
+ * ```
+ */
+export const useCharacterPositions = () => {
+  const [characterPositions, setCharacterPositions] = useState<CharacterData[]>(
+    []
+  );
   const imageRef = useRef<HTMLImageElement>(null);
+  const { selectedImageData } = useGameDataStore();
 
-  const calculatePositions = useCallback(() => {
-    const imgElement = imageRef.current;
+  // Recalculate whenever image size changes
+  const updatePositions = () => {
+    const img = imageRef.current;
+    if (!img || !selectedImageData) return;
 
-    if (!imgElement || !imageData) {
-      console.warn(
-        "Image element or image data not available for position calculation."
-      );
-      return;
-    }
-
-    const currentImageRect = imgElement.getBoundingClientRect();
-    const currentDisplayedWidth = currentImageRect.width;
-    const currentDisplayedHeight = currentImageRect.height;
-
-    if (currentDisplayedWidth === 0 || currentDisplayedHeight === 0) {
-      console.warn(
-        "Image dimensions are zero, cannot calculate positions yet."
-      );
-      return;
-    }
+    const { width, height } = img.getBoundingClientRect();
+    if (!width || !height) return;
+    if (!validateImageData(selectedImageData)) return;
 
     try {
-      const scaleX = currentDisplayedWidth / imageData.originalWidth;
-      const scaleY = currentDisplayedHeight / imageData.originalHeight;
-
-      if (imageData.characterLocations.length === 0) {
-        console.error("Required character data not found in imageData.");
-        toast.error("Game Setup Error", {
-          description: "Critical character data is missing for this image.",
-          duration: 5000,
-        });
-
-        return;
-      }
-
-      const newCharacters: CharacterData[] = imageData.characterLocations.map(
-        (charData) => {
-          return {
-            characterName: charData.characterName,
-            position: {
-              x: charData.targetXRatio * imageData.originalWidth * scaleX,
-              y: charData.targetYRatio * imageData.originalHeight * scaleY,
-            },
-            tolerance: {
-              x: charData.toleranceXRatio * imageData.originalWidth * scaleX,
-              y: charData.toleranceYRatio * imageData.originalHeight * scaleY,
-            },
-          };
-        }
-      );
-
-      setCharacters(newCharacters);
-    } catch (error: unknown) {
-      console.error(
-        "An unexpected error occurred while calculating character positions:",
-        error
-      );
+      const scaled = scaleCharacterPositions(selectedImageData, width, height);
+      setCharacterPositions(scaled);
+    } catch (error) {
+      console.error("Error calculating positions:", error);
       toast.error("Calculation Error", {
-        description:
-          "There was an unexpected issue calculating character positions. Please refresh.",
+        description: "Unable to calculate character positions. Please refresh.",
         duration: 5000,
       });
     }
-  }, [imageData]);
+  };
 
-  const debouncedCalculatePositions = useMemo(
-    () => debounce(calculatePositions, 100),
-    [calculatePositions]
-  );
-
+  // Calculate on image load
   useEffect(() => {
-    const imgElement = imageRef.current;
+    const img = imageRef.current;
+    if (!img) return;
 
-    const handleLoad = () => calculatePositions();
-    const handleResize = () => debouncedCalculatePositions();
-
-    if (imgElement) {
-      if (imgElement.complete) {
-        calculatePositions();
-      }
-      imgElement.addEventListener("load", handleLoad);
+    if (img.complete) {
+      updatePositions();
     }
-    window.addEventListener("resize", handleResize);
 
-    return () => {
-      if (imgElement) {
-        imgElement.removeEventListener("load", handleLoad);
-      }
-      window.removeEventListener("resize", handleResize);
-    };
-  }, [calculatePositions, debouncedCalculatePositions]);
+    img.addEventListener("load", updatePositions);
+    return () => img.removeEventListener("load", updatePositions);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedImageData]);
 
-  return { characters, imageRef };
+  // Recalculate on window resize (debounced via ResizeObserver)
+  useResizeObserver(imageRef, updatePositions);
+
+  return { characterPositions, imageRef };
 };
 
 export default useCharacterPositions;

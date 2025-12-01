@@ -4,6 +4,7 @@ import { devtools } from "zustand/middleware";
 interface GameProgressState {
   // State
   foundCharacters: Set<string>;
+  notFoundCharacters: Set<string>;
   gameCompleted: boolean;
   totalCharacters: number;
   availableCharacterNames: string[];
@@ -27,15 +28,21 @@ export const useGameProgressStore = create<GameProgressState>()(
     (set, get) => ({
       // Initial state
       foundCharacters: new Set(),
+      notFoundCharacters: new Set(),
       gameCompleted: false,
       totalCharacters: 0,
       availableCharacterNames: [],
 
-      setAvailableCharacterNames: (names) => {
-        set({ availableCharacterNames: names });
-      },
+      setAvailableCharacterNames: (names) =>
+        set(
+          {
+            availableCharacterNames: names,
+            notFoundCharacters: new Set(names),
+          },
+          false,
+          "Progress/setAvailableCharacterNames"
+        ),
 
-      // Actions
       markCharacterAsFound: (charName) => {
         if (!get().availableCharacterNames.includes(charName)) {
           console.warn(
@@ -44,40 +51,48 @@ export const useGameProgressStore = create<GameProgressState>()(
           return;
         }
 
-        set((state) => {
-          const newFoundCharacters = new Set(state.foundCharacters);
-          newFoundCharacters.add(charName);
+        set(
+          (state) => {
+            const newFoundCharacters = new Set(state.foundCharacters);
+            newFoundCharacters.add(charName);
 
-          const gameCompleted =
-            state.totalCharacters > 0 &&
-            newFoundCharacters.size === state.totalCharacters;
+            const newNotFoundCharacters = new Set(state.notFoundCharacters);
+            newNotFoundCharacters.delete(charName);
 
-          return {
-            foundCharacters: newFoundCharacters,
-            gameCompleted,
-          };
-        });
+            const gameCompleted =
+              state.totalCharacters > 0 &&
+              newFoundCharacters.size === state.totalCharacters;
+
+            return {
+              foundCharacters: newFoundCharacters,
+              notFoundCharacters: newNotFoundCharacters,
+              gameCompleted,
+            };
+          },
+          false,
+          `Progress/markCharacterAsFound: ${charName}`
+        );
       },
 
-      isCharacterFound: (charName) => {
-        return get().foundCharacters.has(charName);
-      },
+      isCharacterFound: (charName) => get().foundCharacters.has(charName),
 
       areAllCharactersFound: () => {
         const { foundCharacters, totalCharacters } = get();
         return totalCharacters > 0 && foundCharacters.size === totalCharacters;
       },
 
-      resetGame: () => {
-        set({
-          foundCharacters: new Set(),
-          gameCompleted: false,
-        });
-      },
+      resetGame: () =>
+        set(
+          {
+            foundCharacters: new Set(),
+            gameCompleted: false,
+          },
+          false,
+          "Progress/resetGame"
+        ),
 
-      setTotalCharacters: (total) => {
-        set({ totalCharacters: total });
-      },
+      setTotalCharacters: (total) =>
+        set({ totalCharacters: total }, false, "Progress/setTotalCharacters"),
     }),
     { name: "GameProgress" }
   )

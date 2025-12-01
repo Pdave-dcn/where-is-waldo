@@ -6,7 +6,7 @@ interface BoxPosition {
   y: number;
 }
 
-interface GameUIStore {
+interface GameUIState {
   boxPosition: BoxPosition | null;
   showDropdown: boolean;
   showInfoModal: boolean;
@@ -25,35 +25,54 @@ interface GameUIStore {
  * Controls the character selection dropdown (position and visibility)
  * and info modal state during gameplay.
  */
-export const useGameUIStore = create<GameUIStore>()(
+export const useGameUIStore = create<GameUIState>()(
   devtools(
     (set) => ({
       boxPosition: null,
       showDropdown: false,
       showInfoModal: false,
 
-      setBoxPosition: (position) => set({ boxPosition: position }),
-      setShowDropdown: (show) => set({ showDropdown: show }),
-      setShowInfoModal: (show) => set({ showInfoModal: show }),
+      // Action name as 3rd parameter shows in Redux DevTools
+      setBoxPosition: (position) =>
+        set({ boxPosition: position }, false, "UI/setBoxPosition"),
 
+      setShowDropdown: (show) =>
+        set({ showDropdown: show }, false, "UI/setShowDropdown"),
+
+      setShowInfoModal: (show) =>
+        set({ showInfoModal: show }, false, "UI/setShowInfoModal"),
+
+      // Include dynamic data in action names for better debugging
       openDropdownAt: (x, y) =>
-        set({
-          boxPosition: { x, y },
-          showDropdown: true,
-        }),
+        set(
+          {
+            boxPosition: { x, y },
+            showDropdown: true,
+          },
+          false,
+          `UI/openDropdownAt(${Math.round(x)}, ${Math.round(y)})`
+        ),
 
       closeDropdown: () =>
-        set({
-          boxPosition: null,
-          showDropdown: false,
-        }),
+        set(
+          {
+            boxPosition: null,
+            showDropdown: false,
+          },
+          false,
+          "UI/closeDropdown"
+        ),
 
       reset: () =>
-        set({
-          boxPosition: null,
-          showDropdown: false,
-          showInfoModal: false,
-        }),
+        set(
+          {
+            boxPosition: null,
+            showDropdown: false,
+            showInfoModal: false,
+          },
+          false,
+          "UI/reset"
+        ),
     }),
     { name: "GameUI" }
   )

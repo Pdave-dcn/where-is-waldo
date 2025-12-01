@@ -2,6 +2,7 @@ import { forwardRef, useEffect, useImperativeHandle, useState } from "react";
 import { Card } from "./ui/card";
 import { Clock, Play, Pause } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { formatTime } from "@/utils/formatTime.util";
 
 interface TimerProps {
   isRunning: boolean;
@@ -43,12 +44,6 @@ const Timer = forwardRef(
         return seconds;
       },
     }));
-
-    const formatTime = (totalSeconds: number) => {
-      const minutes = Math.floor(totalSeconds / 60);
-      const secs = totalSeconds % 60;
-      return `${minutes}:${secs.toString().padStart(2, "0")}`;
-    };
 
     return (
       <div className="flex items-center gap-4">

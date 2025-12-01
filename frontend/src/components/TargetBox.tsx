@@ -1,71 +1,20 @@
-import { useEffect, useRef, useState } from "react";
 import CharacterDropdown from "./CharacterDropdown";
-import { toast } from "sonner";
 import { type CharacterData } from "@/hooks/use-CharacterPositions";
-import { useGameProgressStore } from "@/stores/gameProgress.store";
-
-interface Position {
-  x: number;
-  y: number;
-}
+import { useTargetBox } from "@/hooks/use-targetBox";
 
 interface TargetBoxProps {
-  position: Position;
-  onClose: () => void;
   characterData: CharacterData[];
 }
 
-const TargetBox = ({ position, onClose, characterData }: TargetBoxProps) => {
-  const [isVisible, setIsVisible] = useState(false);
-  const targetRef = useRef<HTMLDivElement>(null);
-  const { markCharacterAsFound } = useGameProgressStore();
-
-  useEffect(() => {
-    setIsVisible(true);
-
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        targetRef.current &&
-        !targetRef.current.contains(event.target as Node)
-      ) {
-        onClose();
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [onClose]);
-
-  const onCharacterClick = (character: string) => {
-    const selectedCharacter = characterData.find(
-      (char) => char.characterName === character
-    );
-
-    if (!selectedCharacter) return;
-
-    const isCorrectPosition =
-      Math.abs(position.x - selectedCharacter.position.x) <=
-        selectedCharacter.tolerance.x &&
-      Math.abs(position.y - selectedCharacter.position.y) <=
-        selectedCharacter.tolerance.y;
-
-    if (isCorrectPosition) {
-      toast.success(`🎉 You Found ${character}! 🎉`, {
-        description: "Incredible! Your detective skills are top-notch!",
-      });
-      markCharacterAsFound(character);
-    } else {
-      toast.error(`🕵️ Not Quite ${character}... 🕵️`, {
-        description:
-          "He's close, but that's not his exact spot! Try zooming in.",
-      });
-    }
-
-    onClose();
-  };
+const TargetBox = ({ characterData }: TargetBoxProps) => {
+  const {
+    isVisible,
+    targetRef,
+    onCharacterClick,
+    boxPosition: position,
+  } = useTargetBox({
+    characterData,
+  });
 
   return (
     <div
@@ -74,8 +23,8 @@ const TargetBox = ({ position, onClose, characterData }: TargetBoxProps) => {
         isVisible ? "opacity-100 scale-100" : "opacity-0 scale-95"
       }`}
       style={{
-        left: `${position.x}px`,
-        top: `${position.y}px`,
+        left: `${position?.x}px`,
+        top: `${position?.y}px`,
         transform: "translate(-50%, -50%)",
       }}
     >

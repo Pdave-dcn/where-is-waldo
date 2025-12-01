@@ -21,7 +21,7 @@ interface TimerRef {
  * Should be used at the top level of the game component (e.g., Index page).
  *
  * @remarks
- * - Syncs timer state to the metrics store
+ * - Syncs timer state to the metrics store and global store
  * - Shows info modal when a new image is selected
  * - Handles navigation and cleanup on game quit
  * - Coordinates timer ref with game completion tracking
@@ -67,7 +67,7 @@ export const useGameOrchestrator = () => {
 
   const { isIdle } = useGameStatusStore();
   const { setShowInfoModal } = useGameUIStore();
-  const { setSecondsTaken } = useGameMetricsStore();
+  const { setSecondsTaken, setTimerRef } = useGameMetricsStore();
   const {
     areAllCharactersFound,
     setTotalCharacters,
@@ -76,6 +76,12 @@ export const useGameOrchestrator = () => {
 
   const secondsTaken = useGameCompletion(timerRef, GameActions.endGame);
   const isGameComplete = areAllCharactersFound();
+
+  // Store timer ref globally so GameActions can access it
+  useEffect(() => {
+    setTimerRef(timerRef.current);
+    return () => setTimerRef(null);
+  }, [setTimerRef]);
 
   // Sync total characters and available names to store
   useEffect(() => {
@@ -111,12 +117,11 @@ export const useGameOrchestrator = () => {
   const handleQuitGame = () => {
     selectImage(null);
     navigate("/");
-    handleResetGame();
+    GameActions.resetGame();
   };
 
   const handleResetGame = () => {
     GameActions.resetGame();
-    timerRef.current?.reset();
   };
 
   return {

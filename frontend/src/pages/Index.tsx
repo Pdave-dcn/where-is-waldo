@@ -63,7 +63,7 @@ const Index = () => {
 
       {isPaused() && (
         <PauseOverlay
-          onRestart={handleResetGame}
+          onRestart={GameActions.restartGame}
           onResume={GameActions.togglePause}
           onQuit={handleQuitGame}
         />

@@ -3,7 +3,7 @@ import { devtools } from "zustand/middleware";
 
 export type GameStatus = "IDLE" | "RUNNING" | "PAUSED" | "ENDED";
 
-interface GameStatusStore {
+interface GameStatusState {
   status: GameStatus;
 
   // Pure state mutations only
@@ -22,12 +22,13 @@ interface GameStatusStore {
  * Tracks whether the game is idle, running, paused, or ended, with
  * computed helpers for checking the current status.
  */
-export const useGameStatusStore = create<GameStatusStore>()(
+export const useGameStatusStore = create<GameStatusState>()(
   devtools(
     (set, get) => ({
       status: "IDLE",
 
-      setStatus: (status) => set({ status }),
+      setStatus: (status) =>
+        set({ status }, false, `Status/setStatus: ${status}`),
 
       // Read-only computed values
       isIdle: () => get().status === "IDLE",

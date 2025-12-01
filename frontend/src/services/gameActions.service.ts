@@ -138,6 +138,7 @@ export const GameActions = {
    * Resets all game state to initial values.
    *
    * Clears game status, UI state, metrics, and character progress.
+   * Also resets the timer if available.
    * Use this to prepare for a new game or when quitting.
    *
    * @remarks
@@ -146,6 +147,7 @@ export const GameActions = {
    * - UI → Clear dropdowns and modals
    * - Metrics → Reset timer and scores
    * - Progress → Clear found characters
+   * - Timer → Reset to 0
    *
    * @example
    * ```tsx
@@ -156,7 +158,7 @@ export const GameActions = {
     const { reset: resetGameData } = useGameDataStore.getState();
     const { setStatus } = useGameStatusStore.getState();
     const { reset: resetUI } = useGameUIStore.getState();
-    const { reset: resetMetrics } = useGameMetricsStore.getState();
+    const { reset: resetMetrics, timerRef } = useGameMetricsStore.getState();
     const { resetGame: resetProgress } = useGameProgressStore.getState();
 
     resetGameData();
@@ -164,6 +166,29 @@ export const GameActions = {
     resetUI();
     resetMetrics();
     resetProgress();
+    timerRef?.reset();
+  },
+
+  /**
+   * Restarts the current game without changing the selected image.
+   *
+   * Resets metrics, progress, and timer while keeping the same image data.
+   * Sets game status back to IDLE so the player can start fresh.
+   *
+   * @example
+   * ```tsx
+   * <Button onClick={GameActions.restartGame}>Restart</Button>
+   * ```
+   */
+  restartGame: () => {
+    const { setStatus } = useGameStatusStore.getState();
+    const { reset: resetMetrics, timerRef } = useGameMetricsStore.getState();
+    const { resetGame: resetProgress } = useGameProgressStore.getState();
+
+    setStatus("IDLE");
+    resetMetrics();
+    resetProgress();
+    timerRef?.reset();
   },
 
   /**

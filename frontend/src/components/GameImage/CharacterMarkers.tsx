@@ -2,7 +2,6 @@ import type { CharacterData } from "@/hooks/use-CharacterPositions";
 import FoundMark from "../FoundMark";
 import TargetBox from "../TargetBox";
 import { useGameUIStore } from "@/stores/gameUI.store";
-import { GameActions } from "@/services/gameActions.service";
 import { useGameProgressStore } from "@/stores/gameProgress.store";
 
 interface CharacterMarkersProps {
@@ -29,13 +28,7 @@ export const CharacterMarkers = ({ characters }: CharacterMarkersProps) => {
         return null;
       })}
 
-      {boxPosition && showDropdown && (
-        <TargetBox
-          position={boxPosition}
-          onClose={GameActions.closeTargetBox}
-          characterData={characters}
-        />
-      )}
+      {boxPosition && showDropdown && <TargetBox characterData={characters} />}
     </>
   );
 };

@@ -6,7 +6,7 @@ import { EmptyState } from "./EmptyState";
 import { ImageSelectorHeader } from "./ImageSelectorHeader";
 import { ImageCard } from "./ImageCard";
 import { useGameDataStore } from "@/stores/gameData.store";
-import preloadImageBinary from "@/utils/preloadImageBinary";
+import { preloadImageBinary } from "@/utils/gameImage.util";
 
 const ImageSelector = () => {
   const { data: images, isLoading, error } = useImagesQuery();
@@ -14,7 +14,6 @@ const ImageSelector = () => {
   const { prefetchImage } = usePrefetchImage();
 
   const handleImageSelect = async (imageId: string) => {
-    console.log("Selected image ID:", imageId);
     selectImage(imageId);
 
     const data = await prefetchImage(imageId);
