@@ -10,7 +10,7 @@ const Header = () => {
         transition={{ duration: 0.8, ease: "easeOut" }}
       >
         <motion.h1
-          className="text-3xl sm:text-5xl font-bold mb-2"
+          className="text-4xl md:text-5xl lg:text-6xl font-bold mb-2"
           initial={{ scale: 0.8, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{
@@ -28,7 +28,7 @@ const Header = () => {
         </motion.h1>
 
         <motion.p
-          className="sm:text-lg"
+          className="text-lg md:text-2xl"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{
