@@ -28,11 +28,11 @@ export const WinnerFormActions = ({
         <Button
           type="submit"
           className="flex-1 bg-green-600 hover:bg-green-700 text-white w-full cursor-pointer"
-          disabled={disabled}
+          disabled={disabled || isSubmitting}
           onClick={onSubmit}
         >
           {isSubmitting && !disabled ? (
-            <RotateCcw className="animate-spin w-5 h-5 mx-auto" />
+            <RotateCcw className="animate-spin" />
           ) : null}
           Save Score
         </Button>
@@ -45,11 +45,12 @@ export const WinnerFormActions = ({
         <Button
           type="submit"
           variant="outline"
-          onClick={onSubmit}
           className="flex-1 w-full cursor-pointer"
+          disabled={isSubmitting}
+          onClick={onSubmit}
         >
           {isSubmitting && disabled ? (
-            <RotateCcw className="animate-spin w-5 h-5 mx-auto" />
+            <RotateCcw className="animate-spin" />
           ) : null}
           Skip
         </Button>
