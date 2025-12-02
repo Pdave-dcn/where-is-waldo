@@ -29,12 +29,12 @@ A fun, interactive photo‑tagging web app featuring a modern React/TypeScript f
 
 > Add or update your screenshots inside the `/screenshots` folder.
 
-![Image Selection](./screenshots/image-selection-ui.jpeg)
-![Info Modal](./screenshots/info-modal.png)
-![Game Image](./screenshots/ongoing-game.jpeg)
-![Pause Interface](./screenshots/paused.jpeg)
-![Leaderboard](./screenshots/leaderboard.jpeg)
-![Dark Mode](./screenshots/dark-mode.jpeg)
+![Image Selection](./docs/screenshots/image-selection-ui.jpeg)
+![Info Modal](./docs/screenshots/info-modal.png)
+![Game Image](./docs/screenshots/ongoing-game.jpeg)
+![Pause Interface](./docs/screenshots/paused.jpeg)
+![Leaderboard](./docs/screenshots/leaderboard.jpeg)
+![Dark Mode](./docs/screenshots/dark-mode.jpeg)
 
 ---
 
@@ -94,57 +94,104 @@ where-is-waldo/
 
 Follow these steps to set up and run the project locally.
 
-### Prerequisites
+---
 
-- Node.js (v18+ recommended)
-- npm or yarn
-- PostgreSQL (or SQLite for development)
-- Optional: [Postman](https://www.postman.com/) or similar tool for testing API endpoints
+## Prerequisites
 
-### 1. Clone the repository
+- **Node.js** (v18+ recommended)
+- **npm** or **yarn**
+- **PostgreSQL** (or SQLite for development)
+- **Cloudinary account** — required for hosting scene images
+  → [https://cloudinary.com/](https://cloudinary.com/)
+- Optional: **Postman** or similar API tool
+
+---
+
+## 1. Clone the repository
 
 ```bash
 git clone https://github.com/Pdave-dcn/where-is-waldo
 cd where-is-waldo
 ```
 
-### 2. Project Scripts Overview
+---
 
-The monorepo includes scripts for frontend, backend, and database operations.
+## 2. Project Scripts Overview
 
-**Monorepo-level scripts:**
+### **Monorepo-Level Scripts**
 
 ```bash
-npm run start:frontend   # Run frontend only
-npm run start:backend    # Run backend only
-npm run start            # Run both frontend and backend concurrently
-npm run db:seed          # Seed database (runs backend seed script)
+npm run start:frontend   # Start frontend only
+npm run start:backend    # Start backend only
+npm run start            # Start both concurrently (frontend + backend)
+
+npm run db:seed          # Run backend seeding script from root
 ```
 
-**Backend scripts:**
+### **Backend Scripts**
 
 ```bash
 npm run dev             # Start backend in watch mode
-npm run build           # Compile TypeScript
+npm run build           # Compile backend TypeScript
 npm run start           # Run compiled backend
-npm run prisma:migrate  # Run Prisma migrations
+npm run prisma:migrate  # Apply database migrations
 npm run prisma:generate # Generate Prisma client
-npm run prisma:studio   # Open Prisma Studio
-npm run db:seed         # Seed backend database
+npm run prisma:studio   # Open Prisma Studio UI
+npm run db:seed         # Seed database (requires Cloudinary setup)
 ```
 
-### 3. Set up the Backend
+---
+
+## 3. Cloudinary Setup (Required Before Seeding)
+
+To run the app correctly, you **must upload the game images to your own Cloudinary account**.
+
+### **Steps:**
+
+1. Create a Cloudinary account → [https://cloudinary.com/](https://cloudinary.com/)
+
+2. Navigate to:
+
+   ```bash
+   docs/images/
+   ```
+
+   Upload **all images** to your Cloudinary Media Library.
+
+3. For each uploaded image, collect:
+
+   - **secure_url** → becomes `imageUrl`
+   - **public_id** → becomes `publicId`
+   - **width** and **height** → becomes `originalWidth` & `originalHeight`
+
+4. Update the `seed.ts` file with your Cloudinary values:
+
+   ```ts
+   imageUrl: "<secure_url>",
+   publicId: "<public_id>",
+   originalWidth: <width>,
+   originalHeight: <height>,
+   ```
+
+5. Update your backend `.env`:
+
+   ```env
+   CLOUDINARY_CLOUD_NAME="your_cloud_name"
+   CLOUDINARY_API_KEY="your_api_key"
+   CLOUDINARY_API_SECRET="your_api_secret"
+   ```
+
+---
+
+## 4. Set up the Backend
 
 ```bash
 cd backend
 cp .env.example .env
-# Edit .env with your database credentials
 npm install
-npx prisma migrate dev
-npm run dev
 ```
 
-Example Variables:
+Edit `.env`:
 
 ```env
 DATABASE_URL="postgresql://user:password@localhost:5432/where_is_waldo"
@@ -157,9 +204,23 @@ CLOUDINARY_API_KEY="your_api_key"
 CLOUDINARY_API_SECRET="your_api_secret"
 ```
 
-- Backend runs on `http://localhost:3000` by default
+Apply migrations:
 
-### 4. Set up the Frontend
+```bash
+npx prisma migrate dev
+```
+
+Start the backend:
+
+```bash
+npm run start:backend
+```
+
+Backend URL: `http://localhost:3000`
+
+---
+
+## 5. Set up the Frontend
 
 ```bash
 cd ../frontend
@@ -168,21 +229,29 @@ npm install
 npm run dev
 ```
 
-Example Variable:
+Example variable:
 
 ```env
 VITE_API_BASE_URL="http://localhost:3000/api"
 ```
 
-- Frontend runs on `http://localhost:5173` by default (Vite dev server)
+Frontend URL: `http://localhost:5173`
 
-### 5. Optional: Seed Database
+---
+
+## 6. (Required) Seed the Database
+
+After Cloudinary is configured **and** the seed file is updated:
 
 ```bash
 npm run db:seed
 ```
 
-- Populates database with initial data for testing
+This will:
+
+- Insert all images into the database
+- Insert character target locations
+- Upsert existing entries (idempotent)
 
 ---
 
