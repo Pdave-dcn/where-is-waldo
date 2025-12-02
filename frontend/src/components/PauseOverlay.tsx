@@ -1,5 +1,6 @@
 import { Play, RotateCcw, Home } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useEffect } from "react";
 
 interface PauseOverlayProps {
   onResume: () => void;
@@ -8,8 +9,18 @@ interface PauseOverlayProps {
 }
 
 const PauseOverlay = ({ onResume, onRestart, onQuit }: PauseOverlayProps) => {
+  useEffect(() => {
+    // Prevent scrolling when overlay is mounted
+    document.body.style.overflow = "hidden";
+
+    // Restore scrolling when overlay is unmounted
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, []);
+
   return (
-    <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center">
+    <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center overflow-hidden">
       <div className="bg-background rounded-lg p-8 shadow-2xl border-4 text-center max-w-md mx-4">
         <h2 className="text-3xl font-bold text-primary mb-4">Game Paused</h2>
         <p className="text-secondary-foreground mb-8 text-lg">

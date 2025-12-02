@@ -8,49 +8,53 @@ datasource db {
 }
 
 // Model for storing game images
-model GameImage {
+model Image {
   id             String @id @default(uuid())
   name           String @unique
   description    String
-  imageUrl       String @unique
-  publicId       String @unique
-  originalWidth  Int
-  originalHeight Int
+  imageUrl       String @unique @map("image_url")
+  publicId       String @unique @map("public_id")
+  originalWidth  Int    @map("original_width")
+  originalHeight Int    @map("original_height")
 
   characterLocations CharacterLocation[]
   gameCompletions    GameCompletion[]
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("images")
 }
 
 // Model for storing the locations of characters on each GameImage
 model CharacterLocation {
   id            String @id @default(uuid())
-  characterName String
+  characterName String @map("character_name")
 
-  targetXRatio    Float
-  targetYRatio    Float
-  toleranceXRatio Float
-  toleranceYRatio Float
+  targetXRatio    Float @map("target_x_ratio")
+  targetYRatio    Float @map("target_y_ratio")
+  toleranceXRatio Float @map("tolerance_x_ratio")
+  toleranceYRatio Float @map("tolerance_y_ratio")
 
-  gameImage   GameImage @relation(fields: [gameImageId], references: [id], onDelete: Cascade)
-  gameImageId String
+  image   Image  @relation(fields: [imageId], references: [id], onDelete: Cascade)
+  imageId String @map("image_id")
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
-  @@unique([gameImageId, characterName])
+  @@unique([imageId, characterName])
+  @@map("character_locations")
 }
 
 // Model for storing game completion records
 model GameCompletion {
   id               String @id @default(uuid())
-  playerName       String
-  timeTakenSeconds Float
+  playerName       String @map("player_name")
+  timeTakenSeconds Float  @map("time_taken_seconds")
 
-  gameImage   GameImage @relation(fields: [gameImageId], references: [id], onDelete: Cascade)
-  gameImageId String
+  image       Image    @relation(fields: [imageId], references: [id], onDelete: Cascade)
+  imageId     String   @map("image_id")
+  completedAt DateTime @default(now()) @map("completed_at")
 
-  completedAt DateTime @default(now())
+  @@map("game_completions")
 }

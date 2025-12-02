@@ -1,5 +1,3 @@
-// howToPlayModalData.ts
-
 export interface Character {
   name: string;
   signatureLook: string;
@@ -54,5 +52,5 @@ export const gameInstructions: string[] = [
 
 export const importantNotes: string[] = [
   "**Accuracy is Key:** Take your time to click precisely on the characters. Incorrect clicks won't count and might slow you down.",
-  '**Timer Starts Immediately:** The moment you click "Start Game," your time begins!',
+  '**Timer Starts Immediately:** The moment you click "Start Game", your time begins!',
 ];

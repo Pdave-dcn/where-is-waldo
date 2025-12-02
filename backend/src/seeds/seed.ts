@@ -1,4 +1,4 @@
-import prisma from "../config/db.js";
+import prisma from "../core/config/db.js";
 const gameData = [
   {
     image: {
@@ -216,7 +216,7 @@ async function main() {
   console.log(`Start seeding ...`);
 
   for (const data of gameData) {
-    const gameImage = await prisma.gameImage.upsert({
+    const gameImage = await prisma.image.upsert({
       where: { imageUrl: data.image.imageUrl },
       update: {
         name: data.image.name,
@@ -242,8 +242,8 @@ async function main() {
     for (const char of data.characters) {
       await prisma.characterLocation.upsert({
         where: {
-          gameImageId_characterName: {
-            gameImageId: gameImage.id,
+          imageId_characterName: {
+            imageId: gameImage.id,
             characterName: char.characterName,
           },
         },
@@ -259,7 +259,7 @@ async function main() {
           targetYRatio: char.targetYRatio,
           toleranceXRatio: char.toleranceXRatio,
           toleranceYRatio: char.toleranceYRatio,
-          gameImageId: gameImage.id,
+          imageId: gameImage.id,
         },
       });
       console.log(

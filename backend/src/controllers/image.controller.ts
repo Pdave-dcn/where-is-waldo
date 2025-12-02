@@ -1,50 +1,46 @@
 import { Request, Response } from "express";
-import prisma from "../config/db.js";
-import { z } from "zod";
-import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library.js";
+import prisma from "../core/config/db.js";
+import { ImageIdParamSchema, NewImageSchema } from "../zodSchemas/image.zod.js";
+import handleError from "../core/error/index.js";
+import { createLogger } from "../core/config/logger.js";
+import createActionLogger from "../utils/logger.util.js";
 
-const ImageIdParamSchema = z.object({
-  id: z.string().uuid("Invalid Image ID format in URL parameter."),
-});
-
-const NewImageSchema = z.object({
-  name: z.string().min(1, "Name is required."),
-  imageUrl: z
-    .string()
-    .url("Image URL must be a valid URL.")
-    .min(1, "Image url is required."),
-  description: z.string().min(1, "Description is required."),
-  publicId: z.string().min(1, "Cloudinary Public ID is required."),
-  originalWidth: z
-    .number()
-    .int()
-    .positive("Original width must be a positive integer."),
-  originalHeight: z
-    .number()
-    .int()
-    .positive("Original height must be a positive integer."),
-});
+const controllerLogger = createLogger({ module: "ImageController" });
 
 export const addNewImage = async (req: Request, res: Response) => {
+  const actionLogger = createActionLogger(controllerLogger, "addNewImage", req);
   try {
-    const validatedBody = NewImageSchema.parse(req.body);
+    actionLogger.info("Adding new game image");
 
-    const existingImage = await prisma.gameImage.findUnique({
+    const validatedBody = NewImageSchema.parse(req.body);
+    actionLogger.info("Validated request body");
+
+    actionLogger.debug(
+      `Checking for existing image with name: ${validatedBody.name}`
+    );
+    const existingImage = await prisma.image.findUnique({
       where: { name: validatedBody.name },
     });
+
     if (existingImage) {
+      actionLogger.warn(
+        `Image with name: ${validatedBody.name} already exists`
+      );
       return res
         .status(409)
         .json({ message: "Image with this name already exists." });
     }
 
+    actionLogger.debug("Verifying Cloudinary URL");
     if (!validatedBody.imageUrl.includes("res.cloudinary.com")) {
+      actionLogger.warn("Provided URL does not appear to be a Cloudinary URL.");
       return res.status(400).json({
         message: "Provided URL does not appear to be a Cloudinary URL.",
       });
     }
 
-    const newImage = await prisma.gameImage.create({
+    actionLogger.debug("Creating new image record in database");
+    const newImage = await prisma.image.create({
       data: {
         name: validatedBody.name,
         imageUrl: validatedBody.imageUrl,
@@ -55,30 +51,27 @@ export const addNewImage = async (req: Request, res: Response) => {
       },
     });
 
+    actionLogger.info("New game image added successfully");
+
     res.status(201).json({
       message: "Game image details saved successfully",
-      image: newImage,
+      data: newImage,
     });
   } catch (error: unknown) {
-    if (error instanceof z.ZodError) {
-      return res.status(400).json({
-        message: "Validation failed",
-        errors: error.errors.map((err) => ({
-          path: err.path.join("."),
-          message: err.message,
-        })),
-      });
-    }
-    console.error("Error in addNewImage:", error);
-    res.status(500).json({ message: "Internal server error." });
+    return handleError(error, res);
   }
 };
 
 export const getImage = async (req: Request, res: Response) => {
+  const actionLogger = createActionLogger(controllerLogger, "getImage", req);
   try {
-    const { id: imageId } = ImageIdParamSchema.parse(req.params);
+    actionLogger.info("Fetching image details");
 
-    const image = await prisma.gameImage.findUnique({
+    const { id: imageId } = ImageIdParamSchema.parse(req.params);
+    actionLogger.info("Validated request parameters");
+
+    actionLogger.debug(`Looking up image with ID: ${imageId}`);
+    const image = await prisma.image.findUnique({
       where: { id: imageId },
       select: {
         id: true,
@@ -101,6 +94,7 @@ export const getImage = async (req: Request, res: Response) => {
     });
 
     if (!image) {
+      actionLogger.warn(`Image with ID: ${imageId} not found`);
       return res.status(404).json({ message: "Image not found" });
     }
 
@@ -114,31 +108,28 @@ export const getImage = async (req: Request, res: Response) => {
       characterLocations: image.characterLocations,
     };
 
+    actionLogger.info("Image found successfully");
+
     res.status(200).json({
       message: "Image found successfully",
-      image: responseImage,
+      data: responseImage,
     });
   } catch (error: unknown) {
-    if (error instanceof z.ZodError) {
-      return res.status(400).json({
-        message: "Validation failed for request parameters.",
-        errors: error.errors.map((err) => ({
-          path: err.path.join("."),
-          message: err.message,
-        })),
-      });
-    }
-    if (error instanceof PrismaClientKnownRequestError) {
-      console.error("Prisma Error fetching image:", error.message);
-    }
-    console.error("Error getting image:", error);
-    res.status(500).json({ message: "Internal server error." });
+    return handleError(error, res);
   }
 };
 
 export const getAllImages = async (_req: Request, res: Response) => {
+  const actionLogger = createActionLogger(
+    controllerLogger,
+    "getAllImages",
+    _req
+  );
   try {
-    const images = await prisma.gameImage.findMany({
+    actionLogger.info("Fetching all images");
+
+    actionLogger.debug("Querying database for all images");
+    const images = await prisma.image.findMany({
       select: {
         id: true,
         name: true,
@@ -147,16 +138,18 @@ export const getAllImages = async (_req: Request, res: Response) => {
       },
     });
 
+    actionLogger.info(
+      {
+        count: images.length,
+      },
+      "Images found successfully"
+    );
+
     res.status(200).json({
       message: "Images found successfully",
-      images,
+      data: images,
     });
   } catch (error: unknown) {
-    if (error instanceof PrismaClientKnownRequestError) {
-      console.error("Prisma Error fetching image:", error.message);
-    }
-
-    console.error("Error getting image:", error);
-    res.status(500).json({ message: "Internal server error." });
+    return handleError(error, res);
   }
 };

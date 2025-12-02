@@ -9,76 +9,38 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Loader } from "@/components/ui/loader";
-import { useGameData } from "@/hooks/use-GameData";
-import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { useGameProgress } from "@/hooks/use-GameProgress";
+import { useNavigate, useParams } from "react-router-dom";
 import { motion } from "motion/react";
 import { getRankIcon } from "@/utils/leaderboardUtils";
+import { useLeaderboardQuery } from "@/queries/leaderboard.query";
+import { GameActions } from "@/services/gameActions.service";
+import { LeaderboardSkeleton } from "@/components/Leaderboard/LeaderboardSkeleton";
+import { LeaderboardError } from "@/components/Leaderboard/LeaderboardError";
+import { formatTime } from "@/utils/formatTime.util";
+import { useSingleImageQuery } from "@/queries/image.query";
 
 const LeaderboardPage = () => {
-  const {
-    fetchLeaderboardData,
-    leaderboardLoading,
-    leaderboardError,
-    leaderboardData,
-    imageData,
-    setSelectedImageId,
-  } = useGameData();
-
-  const { resetGame } = useGameProgress();
-
   const navigate = useNavigate();
+  const { id: imageId } = useParams();
 
-  useEffect(() => {
-    fetchLeaderboardData();
-  }, []);
+  const {
+    data: leaderboardData,
+    isLoading: leaderboardLoading,
+    isError: leaderboardError,
+    refetch: refetchLeaderboard,
+  } = useLeaderboardQuery(imageId || "");
 
-  const resetGameProgress = () => {
-    setSelectedImageId(null);
-    resetGame();
+  const { data: singleImageData } = useSingleImageQuery(imageId || "");
+
+  const resetGame = () => {
+    GameActions.resetGame();
+    navigate("/");
   };
 
-  const formatTime = (seconds: number) => {
-    const minutes = Math.floor(seconds / 60);
-    const remainingSeconds = Math.floor(seconds % 60);
-    return `${minutes}:${remainingSeconds.toString().padStart(2, "0")}`;
-  };
+  if (leaderboardLoading) return <LeaderboardSkeleton />;
 
-  if (!imageData) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <Loader />
-      </div>
-    );
-  }
-
-  if (leaderboardLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <Loader />
-      </div>
-    );
-  }
-
-  if (leaderboardError) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="text-center">
-          <h2 className="text-2xl font-bold mb-2">
-            Failed to load leaderboard
-          </h2>
-          <Button
-            className="px-4 py-2 bg-accent rounded hover:bg-accent-dark transition"
-            onClick={() => window.location.reload()}
-          >
-            Retry
-          </Button>
-        </div>
-      </div>
-    );
-  }
+  if (leaderboardError)
+    return <LeaderboardError onRetry={() => refetchLeaderboard()} />;
 
   if (!leaderboardData) {
     return (
@@ -103,10 +65,7 @@ const LeaderboardPage = () => {
           <Button
             variant="ghost"
             className="flex items-center gap-2 text-lg text-primary hover:text-primary-dark cursor-pointer"
-            onClick={() => {
-              navigate("/");
-              resetGameProgress();
-            }}
+            onClick={resetGame}
           >
             <ArrowLeftCircle className="w-6 h-6" />
             Back to Image Selection
@@ -131,10 +90,10 @@ const LeaderboardPage = () => {
                 transition={{ duration: 0.6, delay: 0.5 }}
               >
                 <CardTitle className="text-center text-3xl font-bold">
-                  Leaderboard for: {imageData?.name}
+                  Leaderboard for: {singleImageData?.name}
                 </CardTitle>
                 <p className="text-center text-muted-foreground">
-                  {imageData?.description}
+                  {singleImageData?.description}
                 </p>
               </motion.div>
             </CardHeader>
@@ -150,8 +109,8 @@ const LeaderboardPage = () => {
                 }}
               >
                 <img
-                  src={imageData?.url}
-                  alt={imageData?.name}
+                  src={singleImageData?.url}
+                  alt={singleImageData?.name}
                   className="w-full h-full object-cover"
                   loading="lazy"
                 />
