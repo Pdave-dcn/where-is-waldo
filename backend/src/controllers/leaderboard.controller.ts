@@ -1,9 +1,9 @@
 import { Request, Response } from "express";
-import prisma from "../core/config/db";
-import { createLogger } from "../core/config/logger";
-import { ImageIdParamSchema } from "../zodSchemas/image.zod";
+import prisma from "../core/config/db.js";
+import { createLogger } from "../core/config/logger.js";
+import { ImageIdParamSchema } from "../zodSchemas/image.zod.js";
 import handleError from "../core/error";
-import createActionLogger from "../utils/logger.util";
+import createActionLogger from "../utils/logger.util.js";
 
 const controllerLogger = createLogger({ module: "LeaderboardController" });
 

@@ -38,4 +38,10 @@ router.use("/api", characterLocationRoutes);
 router.use("/api", gameCompletionRoutes);
 router.use("/api", leaderboardRoutes);
 
+router.use(/.*/, (_req, res) => {
+  res.status(404).json({
+    message: "Route not found",
+  });
+});
+
 export default router;

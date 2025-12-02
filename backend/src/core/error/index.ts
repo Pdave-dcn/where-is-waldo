@@ -1,9 +1,9 @@
 import { Prisma } from "@prisma/client";
 import { Request, Response } from "express";
-import DatabaseErrorHandler from "./handlers/database.handler";
+import DatabaseErrorHandler from "./handlers/database.handler.js";
 import { ZodError } from "zod";
-import ValidationErrorHandler from "./handlers/validation.handler";
-import { logger } from "../config/logger";
+import ValidationErrorHandler from "./handlers/validation.handler.js";
+import { logger } from "../config/logger.js";
 
 const handleError = (error: unknown, res: Response) => {
   const req = res.req as
