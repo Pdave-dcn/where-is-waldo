@@ -27,8 +27,6 @@ A fun, interactive photo‑tagging web app featuring a modern React/TypeScript f
 
 ## Screenshots
 
-> Add or update your screenshots inside the `/screenshots` folder.
-
 ![Image Selection](./docs/screenshots/image-selection-ui.jpeg)
 ![Info Modal](./docs/screenshots/info-modal.png)
 ![Game Image](./docs/screenshots/ongoing-game.jpeg)
@@ -40,7 +38,7 @@ A fun, interactive photo‑tagging web app featuring a modern React/TypeScript f
 
 ## Live Demo
 
-**Demo URL:** _<your‑live‑demo‑link>_
+**Demo URL:** _<https://whereiswaldoonline.netlify.app/>_
 
 ---
 
