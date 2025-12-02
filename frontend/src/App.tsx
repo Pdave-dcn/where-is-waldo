@@ -5,11 +5,13 @@ import { Toaster } from "sonner";
 import LeaderboardPage from "./pages/LeaderboardPage";
 import { ThemeProvider } from "./contexts/ThemeProvider";
 import { ThemeToggle } from "./components/ThemeToggle";
+import ScrollToTop from "./components/ScrollToTop";
 
 const App = () => {
   return (
     <ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">
       <BrowserRouter>
+        <ScrollToTop />
         <Toaster position="top-center" richColors />
         <div className="relative">
           <Routes>
