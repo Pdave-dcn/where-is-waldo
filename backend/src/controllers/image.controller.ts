@@ -1,13 +1,16 @@
-import { Request, Response } from "express";
+import { Request, Response, NextFunction } from "express";
 import prisma from "../core/config/db.js";
 import { ImageIdParamSchema, NewImageSchema } from "../zodSchemas/image.zod.js";
-import handleError from "../core/error/index.js";
 import { createLogger } from "../core/config/logger.js";
 import createActionLogger from "../utils/logger.util.js";
 
 const controllerLogger = createLogger({ module: "ImageController" });
 
-export const addNewImage = async (req: Request, res: Response) => {
+export const addNewImage = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   const actionLogger = createActionLogger(controllerLogger, "addNewImage", req);
   try {
     actionLogger.info("Adding new game image");
@@ -58,11 +61,15 @@ export const addNewImage = async (req: Request, res: Response) => {
       data: newImage,
     });
   } catch (error: unknown) {
-    return handleError(error, res);
+    return next(error);
   }
 };
 
-export const getImage = async (req: Request, res: Response) => {
+export const getImage = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   const actionLogger = createActionLogger(controllerLogger, "getImage", req);
   try {
     actionLogger.info("Fetching image details");
@@ -115,11 +122,15 @@ export const getImage = async (req: Request, res: Response) => {
       data: responseImage,
     });
   } catch (error: unknown) {
-    return handleError(error, res);
+    return next(error);
   }
 };
 
-export const getAllImages = async (_req: Request, res: Response) => {
+export const getAllImages = async (
+  _req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   const actionLogger = createActionLogger(
     controllerLogger,
     "getAllImages",
@@ -150,6 +161,6 @@ export const getAllImages = async (_req: Request, res: Response) => {
       data: images,
     });
   } catch (error: unknown) {
-    return handleError(error, res);
+    return next(error);
   }
 };

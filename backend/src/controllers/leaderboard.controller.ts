@@ -1,13 +1,16 @@
-import { Request, Response } from "express";
+import { Request, Response, NextFunction } from "express";
 import prisma from "../core/config/db.js";
 import { createLogger } from "../core/config/logger.js";
 import { ImageIdParamSchema } from "../zodSchemas/image.zod.js";
-import handleError from "../core/error";
 import createActionLogger from "../utils/logger.util.js";
 
 const controllerLogger = createLogger({ module: "LeaderboardController" });
 
-export const getLeaderboardForImage = async (req: Request, res: Response) => {
+export const getLeaderboardForImage = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   const actionLogger = createActionLogger(
     controllerLogger,
     "getLeaderboardForImage",
@@ -48,6 +51,6 @@ export const getLeaderboardForImage = async (req: Request, res: Response) => {
       data: leaderboard,
     });
   } catch (error: unknown) {
-    return handleError(error, res);
+    return next(error);
   }
 };

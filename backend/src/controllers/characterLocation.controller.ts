@@ -1,8 +1,7 @@
-import { Request, Response } from "express";
+import { Request, Response, NextFunction } from "express";
 import prisma from "../core/config/db.js";
 import { CharacterLocationSchema } from "../zodSchemas/location.zod.js";
 import { ImageIdParamSchema } from "../zodSchemas/image.zod.js";
-import handleError from "../core/error/index.js";
 import { createLogger } from "../core/config/logger.js";
 import createActionLogger from "../utils/logger.util.js";
 
@@ -10,7 +9,11 @@ const controllerLogger = createLogger({
   module: "CharacterLocationController",
 });
 
-export const addCharacterLocation = async (req: Request, res: Response) => {
+export const addCharacterLocation = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   const actionLogger = createActionLogger(
     controllerLogger,
     "addCharacterLocation",
@@ -51,6 +54,6 @@ export const addCharacterLocation = async (req: Request, res: Response) => {
       data: location,
     });
   } catch (error: unknown) {
-    return handleError(error, res);
+    return next(error);
   }
 };
