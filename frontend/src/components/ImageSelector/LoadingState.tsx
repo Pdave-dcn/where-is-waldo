@@ -1,36 +1,37 @@
 import { motion } from "motion/react";
 import { Card, CardContent } from "../ui/card";
-import { Loader } from "../ui/loader";
+import { Skeleton } from "../ui/skeleton";
 
 export const LoadingState = () => {
   return (
-    <div className="flex items-center justify-center bg-accent py-10">
-      <motion.div
-        initial={{ opacity: 0, scale: 0.9 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.5 }}
-      >
-        <Card className="w-full max-w-5xl">
-          <CardContent className="p-8 flex items-center justify-center">
-            <div className="text-center flex flex-col items-center">
-              <motion.div
-                animate={{ rotate: 360 }}
-                transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-              >
-                <Loader />
-              </motion.div>
-              <motion.p
-                className="mt-4 text-muted-foreground"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.3 }}
-              >
-                Loading game...
-              </motion.p>
-            </div>
-          </CardContent>
-        </Card>
-      </motion.div>
+    <div className="min-h-screen bg-accent">
+      <div className="container mx-auto px-4 py-8">
+        {/* Header Skeleton */}
+        <div className="text-center mb-12">
+          <Skeleton className="h-12 w-64 mx-auto mb-4" />
+          <Skeleton className="h-6 w-96 mx-auto" />
+        </div>
+
+        {/* Grid of Image Card Skeletons */}
+        <motion.div
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto mb-8"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5 }}
+        >
+          {[...Array(6)].map((_, index) => (
+            <Card key={index} className="overflow-hidden">
+              <CardContent className="p-0">
+                <Skeleton className="w-full aspect-square" />
+                <div className="p-4">
+                  <Skeleton className="h-6 w-3/4 mb-2" />
+                  <Skeleton className="h-4 w-full" />
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </motion.div>
+      </div>
     </div>
   );
 };
