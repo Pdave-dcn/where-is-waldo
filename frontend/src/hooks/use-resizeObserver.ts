@@ -1,20 +1,19 @@
-import { useEffect, type RefObject } from "react";
+import { useEffect, useRef, type RefObject } from "react";
 
-/**
- * Observes element size changes and triggers a callback.
- * Automatically debounced via ResizeObserver's native batching.
- */
 export function useResizeObserver(
   ref: RefObject<HTMLImageElement | null>,
   callback: () => void
 ) {
+  const callbackRef = useRef(callback);
+  callbackRef.current = callback;
+
   useEffect(() => {
     const element = ref?.current;
     if (!element) return;
 
-    const observer = new ResizeObserver(() => callback());
+    const observer = new ResizeObserver(() => callbackRef.current());
     observer.observe(element);
 
     return () => observer.disconnect();
-  }, [ref, callback]);
+  }, [ref]);
 }

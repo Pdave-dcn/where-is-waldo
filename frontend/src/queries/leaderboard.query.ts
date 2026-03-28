@@ -5,5 +5,6 @@ export const useLeaderboardQuery = (imageId: string) => {
   return useQuery({
     queryKey: ["leaderboard", imageId],
     queryFn: () => getLeaderboard(imageId),
+    staleTime: 5 * 60 * 1000,
   });
 };

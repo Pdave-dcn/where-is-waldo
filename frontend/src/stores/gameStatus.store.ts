@@ -6,10 +6,8 @@ export type GameStatus = "IDLE" | "RUNNING" | "PAUSED" | "ENDED";
 interface GameStatusState {
   status: GameStatus;
 
-  // Pure state mutations only
   setStatus: (status: GameStatus) => void;
 
-  // Computed helpers
   isIdle: () => boolean;
   isRunning: () => boolean;
   isPaused: () => boolean;
@@ -17,20 +15,14 @@ interface GameStatusState {
   isActive: () => boolean;
 }
 
-/**
- * Game status store for managing the current game state lifecycle.
- * Tracks whether the game is idle, running, paused, or ended, with
- * computed helpers for checking the current status.
- */
 export const useGameStatusStore = create<GameStatusState>()(
   devtools(
     (set, get) => ({
       status: "IDLE",
 
-      setStatus: (status) =>
+      setStatus: (status: GameStatus) =>
         set({ status }, false, `Status/setStatus: ${status}`),
 
-      // Read-only computed values
       isIdle: () => get().status === "IDLE",
       isRunning: () => get().status === "RUNNING",
       isPaused: () => get().status === "PAUSED",
@@ -40,6 +32,6 @@ export const useGameStatusStore = create<GameStatusState>()(
         return s === "RUNNING" || s === "PAUSED";
       },
     }),
-    { name: "GameStatus" }
+    process.env.NODE_ENV === "development" ? { name: "GameStatus" } : {}
   )
 );

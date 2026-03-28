@@ -16,11 +16,6 @@ interface GameUIState {
   reset: () => void;
 }
 
-/**
- * Game UI store for managing interactive overlay elements.
- * Controls the character selection dropdown (position and visibility)
- * and info modal state during gameplay.
- */
 export const useGameUIStore = create<GameUIState>()(
   devtools(
     (set) => ({
@@ -28,10 +23,10 @@ export const useGameUIStore = create<GameUIState>()(
       showBox: false,
       showInfoModal: false,
 
-      setBoxPosition: (position) =>
+      setBoxPosition: (position: BoxPosition | null) =>
         set({ boxPosition: position }, false, "UI/setBoxPosition"),
 
-      setShowInfoModal: (show) =>
+      setShowInfoModal: (show: boolean) =>
         set({ showInfoModal: show }, false, "UI/setShowInfoModal"),
 
       reset: () =>
@@ -44,6 +39,6 @@ export const useGameUIStore = create<GameUIState>()(
           "UI/reset"
         ),
     }),
-    { name: "GameUI" }
+    process.env.NODE_ENV === "development" ? { name: "GameUI" } : {}
   )
 );

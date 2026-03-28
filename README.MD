@@ -157,7 +157,6 @@ To run the app correctly, you **must upload the game images to your own Cloudina
    Upload **all images** to your Cloudinary Media Library.
 
 3. For each uploaded image, collect:
-
    - **secure_url** → becomes `imageUrl`
    - **public_id** → becomes `publicId`
    - **width** and **height** → becomes `originalWidth` & `originalHeight`
@@ -264,7 +263,6 @@ This will:
 ### Backend Restructure
 
 - Reorganized the entire `src/` folder for better scalability and separation of concerns
-
   - Added `zodSchemas/` for request/response validation
   - Added `core/` to house foundational logic
   - Moved `config/` inside `core/`
@@ -273,7 +271,6 @@ This will:
 ### Frontend Restructure
 
 - Reorganized the `src/` directory to clearly separate logic layers
-
   - Added `zodSchemas/` for frontend validation
   - Added `api/` for Axios endpoint definitions and clients
   - Added `queries/` for React Query hooks
@@ -360,6 +357,22 @@ Zustand handles core game UI and logic state:
 - Improve accessibility and keyboard navigation
 - Add real‑time leaderboard updates
 - Add full test coverage
+
+---
+
+## Documentation
+
+Detailed developer documentation is available in the [`docs/`](./docs/README.md) folder:
+
+| Document                                                     | Description                               |
+| ------------------------------------------------------------ | ----------------------------------------- |
+| [docs/README.md](./docs/README.md)                           | Documentation index                       |
+| [docs/architecture/README.md](./docs/architecture/README.md) | System architecture and data flow         |
+| [docs/backend/README.md](./docs/backend/README.md)           | Backend API, routes, and database         |
+| [docs/frontend/README.md](./docs/frontend/README.md)         | Frontend components, stores, and patterns |
+| [docs/guides/README.md](./docs/guides/README.md)             | Developer setup and workflows             |
+| [docs/features/README.md](./docs/features/README.md)         | Feature breakdown and algorithms          |
+| [docs/performance.md](./docs/performance.md)                 | Performance optimizations                 |
 
 ---
 

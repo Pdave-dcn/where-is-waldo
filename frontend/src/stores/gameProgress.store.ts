@@ -2,14 +2,12 @@ import { create } from "zustand";
 import { devtools } from "zustand/middleware";
 
 interface GameProgressState {
-  // State
   foundCharacters: Set<string>;
   notFoundCharacters: Set<string>;
   gameCompleted: boolean;
   totalCharacters: number;
   availableCharacterNames: string[];
 
-  // Actions
   markCharacterAsFound: (charName: string) => void;
   isCharacterFound: (charName: string) => boolean;
   areAllCharactersFound: () => boolean;
@@ -18,22 +16,16 @@ interface GameProgressState {
   setAvailableCharacterNames: (names: string[]) => void;
 }
 
-/**
- * Game progress store for tracking found characters and completion status.
- * Manages which characters have been discovered, validates findings against
- * available characters, and determines when all characters are found.
- */
 export const useGameProgressStore = create<GameProgressState>()(
   devtools(
     (set, get) => ({
-      // Initial state
-      foundCharacters: new Set(),
-      notFoundCharacters: new Set(),
+      foundCharacters: new Set<string>(),
+      notFoundCharacters: new Set<string>(),
       gameCompleted: false,
       totalCharacters: 0,
       availableCharacterNames: [],
 
-      setAvailableCharacterNames: (names) =>
+      setAvailableCharacterNames: (names: string[]) =>
         set(
           {
             availableCharacterNames: names,
@@ -43,7 +35,7 @@ export const useGameProgressStore = create<GameProgressState>()(
           "Progress/setAvailableCharacterNames"
         ),
 
-      markCharacterAsFound: (charName) => {
+      markCharacterAsFound: (charName: string) => {
         if (!get().availableCharacterNames.includes(charName)) {
           console.warn(
             `Character "${charName}" not found in current image data`
@@ -74,7 +66,7 @@ export const useGameProgressStore = create<GameProgressState>()(
         );
       },
 
-      isCharacterFound: (charName) => get().foundCharacters.has(charName),
+      isCharacterFound: (charName: string) => get().foundCharacters.has(charName),
 
       areAllCharactersFound: () => {
         const { foundCharacters, totalCharacters } = get();
@@ -84,16 +76,16 @@ export const useGameProgressStore = create<GameProgressState>()(
       resetGame: () =>
         set(
           {
-            foundCharacters: new Set(),
+            foundCharacters: new Set<string>(),
             gameCompleted: false,
           },
           false,
           "Progress/resetGame"
         ),
 
-      setTotalCharacters: (total) =>
+      setTotalCharacters: (total: number) =>
         set({ totalCharacters: total }, false, "Progress/setTotalCharacters"),
     }),
-    { name: "GameProgress" }
+    process.env.NODE_ENV === "development" ? { name: "GameProgress" } : {}
   )
 );

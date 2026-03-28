@@ -8,6 +8,9 @@ interface CharacterListProps {
 const CharacterList = ({ onCharacterClick }: CharacterListProps) => {
   const { notFoundCharacters } = useGameProgressStore();
 
+  const characters = Array.from(notFoundCharacters);
+  const charactersLength = characters.length;
+
   return (
     <div className="relative min-w-56">
       <button
@@ -22,7 +25,7 @@ const CharacterList = ({ onCharacterClick }: CharacterListProps) => {
       {
         <div className="absolute top-full left-0 mt-2 w-full bg-background rounded-xl shadow-2xl border-2 border-border overflow-hidden z-20">
           <div className="py-2">
-            {Array.from(notFoundCharacters).map((character, index) => (
+            {characters.map((character, index) => (
               <div key={character}>
                 <div
                   onClick={() => onCharacterClick(character)}
@@ -34,7 +37,7 @@ const CharacterList = ({ onCharacterClick }: CharacterListProps) => {
                     {character}
                   </span>
                 </div>
-                {index < Array.from(notFoundCharacters).length - 1 && (
+                {index < charactersLength - 1 && (
                   <div className="mx-4 border-b border-border/50" />
                 )}
               </div>

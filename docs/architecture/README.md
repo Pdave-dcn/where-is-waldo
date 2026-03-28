@@ -1,0 +1,232 @@
+# Architecture Overview
+
+High-level system design and data flow for the Where's Waldo game.
+
+## System Diagram
+
+```yaml
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                              CLIENT (Browser)                                 │
+│                                                                              │
+│  ┌─────────────┐    ┌─────────────┐    ┌─────────────┐    ┌─────────────┐  │
+│  │   React     │    │   Zustand   │    │ React Query │    │   Sonner    │  │
+│  │ Components  │◄──►│   Stores    │    │   Hooks     │    │   Toasts    │  │
+│  └──────┬──────┘    └──────┬──────┘    └──────┬──────┘    └─────────────┘  │
+│         │                   │                   │                            │
+│         │                   │                   │                            │
+│         ▼                   │                   ▼                            │
+│  ┌─────────────────────────────────────────────────────────────┐            │
+│  │                     Axios API Client                         │            │
+│  │                   (frontend/src/api/)                        │            │
+│  └───────────────────────────┬─────────────────────────────────┘            │
+└───────────────────────────────│───────────────────────────────────────────────┘
+│ HTTP/REST
+▼
+┌───────────────────────────────────────────────────────────────────────────────┐
+│                           SERVER (Node.js)                                  │
+│                                                                              │
+│  ┌─────────────┐    ┌─────────────┐    ┌─────────────┐    ┌─────────────┐  │
+│  │  Express    │───►│  Middleware │───►│   Routes    │───►│ Controllers │  │
+│  │   Entry     │    │ (CORS, Rate │    │ (image,     │    │  (image,    │  │
+│  │  (index.ts) │    │  Logging)   │    │  leaderboard│    │  leaderboard│  │
+│  └─────────────┘    └─────────────┘    │  completion) │    │  completion)│  │
+│                                        └─────────────┘    └──────┬──────┘  │
+│                                                                    │         │
+│                                                                    ▼         │
+│  ┌─────────────────────────────────────────────────────────────────────┐    │
+│  │                        Prisma ORM                                    │    │
+│  │                      (backend/src/core/config/db.ts)                 │    │
+│  └────────────────────────────┬────────────────────────────────────────┘    │
+└───────────────────────────────│──────────────────────────────────────────────┘
+│ SQL
+▼
+┌───────────────────────────────────────────────────────────────────────────────┐
+│                           DATABASE (PostgreSQL)                                │
+│                                                                              │
+│  ┌─────────────┐    ┌─────────────┐    ┌─────────────┐                       │
+│  │    Image    │◄───│Character    │    │GameComplete │                       │
+│  │   Table     │    │ Location    │    │   ion       │                       │
+│  │             │    │   Table     │    │   Table     │                       │
+│  └─────────────┘    └─────────────┘    └─────────────┘                       │
+└───────────────────────────────────────────────────────────────────────────────┘
+│
+│ (Image files stored externally)
+▼
+┌───────────────┐
+│  Cloudinary  │
+│  (CDN)       │
+└───────────────┘
+```
+
+## Component Interactions
+
+### Frontend → Backend Communication
+
+```yaml
+┌──────────────┐         ┌──────────────┐         ┌──────────────┐
+│   Component  │────────►│  React Query │────────►│    Axios     │
+│              │         │    Hook     │         │   Client     │
+└──────────────┘         └──────────────┘         └──────┬───────┘
+▲                                                   │
+│                    ┌──────────────┐                │
+└────────────────────│   Zod       │◄───────────────┘
+│  Validation │
+└──────────────┘
+```
+
+### State Management Flow
+
+```yaml
+┌─────────────────────────────────────────────────────────────────────┐
+│                         ZUSTAND STORES                              │
+├─────────────────────────────────────────────────────────────────────┤
+│                                                                     │
+│  ┌───────────────┐  ┌───────────────┐  ┌───────────────┐          │
+│  │  GameData     │  │ GameStatus    │  │  GameTimer    │          │
+│  │  Store        │  │  Store        │  │   Store       │          │
+│  │               │  │               │  │               │          │
+│  │ - imageData   │  │ - status      │  │ - seconds     │          │
+│  │ - selectedId  │  │ - isRunning   │  │ - intervalId │          │
+│  │ - aspectRatio │  │ - isPaused    │  │ (closure)    │          │
+│  └───────┬───────┘  └───────┬───────┘  └───────┬───────┘          │
+│          │                  │                  │                   │
+│          │    ┌─────────────┴──────────────────┘                   │
+│          │    │                                                       │
+│          ▼    ▼                                                       │
+│  ┌───────────────────────────────────────────────────────┐         │
+│  │              GameActions Service                         │         │
+│  │         (Coordinates multiple stores)                   │         │
+│  └───────────────────────────────────────────────────────┘         │
+│                                                                     │
+│  ┌───────────────┐  ┌───────────────┐  ┌───────────────┐          │
+│  │  GameProgress │  │   GameUI      │  │ GameMetrics   │          │
+│  │  Store        │  │   Store       │  │  Store        │          │
+│  │               │  │               │  │               │          │
+│  │ - foundChars  │  │ - boxPosition │  │ - secondsTaken│          │
+│  │ - notFound    │  │ - showModal   │  │ - startTime   │          │
+│  │ - completed   │  │               │  │               │          │
+│  └───────────────┘  └───────────────┘  └───────────────┘          │
+│                                                                     │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+## Request/Response Flow
+
+### Game Image Selection
+
+```yaml
+1. User clicks image card
+└─► ImageSelector.handleImageSelect()
+└─► useGameDataStore.selectImage(imageId)
+└─► navigate("/")
+
+2. Index page detects selectedImageId
+└─► Renders GameImage component
+└─► useSingleImageQuery(imageId) [React Query]
+└─► getImageById(imageId) [Axios]
+└─► GET /api/image/:id
+
+3. Response validation
+└─► ImageDataSchema.parse(response.data)
+└─► useGameDataStore.setSelectedImageData(data)
+```
+
+### Character Finding
+
+```yaml
+1. User clicks on game image
+└─► GameImage onClick handler
+└─► useTargetBox.handleImageClick(x, y)
+└─► useCharacterPositions recalculates tolerance
+
+2. Target box shows with character list
+└─► CharacterList renders notFoundCharacters
+└─► useGameProgressStore
+
+3. User selects character from dropdown
+└─► TargetBox.onCharacterClick(characterName)
+└─► useGameProgressStore.markCharacterAsFound(name)
+└─► If all found → areAllCharactersFound() = true
+└─► GameActions.endGame()
+└─► useTimerStore.stop()
+└─► useGameStatusStore.setStatus("ENDED")
+└─► WinnerForm displayed
+```
+
+### Score Submission
+
+```yaml
+1. User completes form
+└─► WinnerForm.handleSubmit()
+└─► useCompletionMutation()
+└─► createGameCompletion(data, imageId) [Axios]
+└─► POST /api/image/:id/game-completion
+
+2. Backend validates
+└─► GameCompletionSchema.parse(body)
+└─► Verify image exists
+└─► prisma.gameCompletion.create()
+
+3. Success response
+└─► React Query invalidates leaderboard cache
+└─► navigate("/leaderboard/:id")
+└─► useLeaderboardQuery(id)
+└─► GET /api/image/:id/leaderboard
+```
+
+## Data Architecture
+
+### Client-Side State (Zustand)
+
+| Store          | Purpose             | Key State                               |
+| -------------- | ------------------- | --------------------------------------- |
+| `gameData`     | Selected image info | `selectedImageData`, `aspectRatio`      |
+| `gameStatus`   | Game lifecycle      | `status: IDLE\|RUNNING\|PAUSED\|ENDED`  |
+| `gameTimer`    | Elapsed time        | `seconds`, `isRunning`, `isPaused`      |
+| `gameProgress` | Found characters    | `foundCharacters`, `notFoundCharacters` |
+| `gameUI`       | Overlay state       | `boxPosition`, `showInfoModal`          |
+| `gameMetrics`  | Final metrics       | `secondsTaken`, `startTime`             |
+
+### Server-Side State (React Query)
+
+| Query                 | Key                        | Stale Time |
+| --------------------- | -------------------------- | ---------- |
+| `useImagesQuery`      | `["images"]`               | 24 hours   |
+| `useSingleImageQuery` | `["image", id]`            | 24 hours   |
+| `useLeaderboardQuery` | `["leaderboard", imageId]` | 5 minutes  |
+
+### Database Models
+
+```yaml
+Image (1) ─────< CharacterLocation (many)
+│
+└──────────< GameCompletion (many)
+```
+
+## Environment Variables
+
+### Backend (.env)
+
+```yaml
+DATABASE_URL=postgresql://...
+ALLOWED_ORIGIN=http://localhost:5173
+NODE_ENV=development
+LOG_LEVEL=debug
+CLOUDINARY_CLOUD_NAME=...
+CLOUDINARY_API_KEY=...
+CLOUDINARY_API_SECRET=...
+```
+
+### Frontend (.env)
+
+```yaml
+VITE_API_BASE_URL=http://localhost:3000
+```
+
+## Ports
+
+| Service       | Default Port | Config Location           |
+| ------------- | ------------ | ------------------------- |
+| Backend API   | 3000         | `backend/src/index.ts`    |
+| Frontend Dev  | 5173         | `frontend/vite.config.ts` |
+| Prisma Studio | 5555         | `npm run prisma:studio`   |

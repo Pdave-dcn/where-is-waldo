@@ -1,3 +1,4 @@
+import { memo } from "react";
 import type { CharacterData } from "@/hooks/use-CharacterPositions";
 import FoundMark from "../FoundMark";
 import { useGameProgressStore } from "@/stores/gameProgress.store";
@@ -6,13 +7,13 @@ interface CharacterMarkersProps {
   characterData: CharacterData[];
 }
 
-export const CharacterMarkers = ({ characterData }: CharacterMarkersProps) => {
-  const { isCharacterFound } = useGameProgressStore();
+const CharacterMarkersComponent = ({ characterData }: CharacterMarkersProps) => {
+  const foundCharacters = useGameProgressStore((s) => s.foundCharacters);
 
   return (
     <>
       {characterData.map((char) =>
-        isCharacterFound(char.characterName) ? (
+        foundCharacters.has(char.characterName) ? (
           <FoundMark
             key={char.characterName}
             characterName={char.characterName}
@@ -23,3 +24,5 @@ export const CharacterMarkers = ({ characterData }: CharacterMarkersProps) => {
     </>
   );
 };
+
+export const CharacterMarkers = memo(CharacterMarkersComponent);

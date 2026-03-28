@@ -5,7 +5,6 @@ interface TimerState {
   seconds: number;
   isRunning: boolean;
   isPaused: boolean;
-  _intervalId: NodeJS.Timeout | null;
 
   start: () => void;
   pause: () => void;
@@ -14,81 +13,72 @@ interface TimerState {
   stop: () => number;
 }
 
-/**
- * Game timer store for tracking elapsed time during a game session.
- * Provides controls to start, pause, resume, reset, and stop the timer.
- */
 export const useTimerStore = create<TimerState>()(
   devtools(
-    (set, get) => ({
-      seconds: 0,
-      isRunning: false,
-      isPaused: false,
-      _intervalId: null,
+    (set, get) => {
+      let intervalId: ReturnType<typeof setInterval> | null = null;
 
-      start: () => {
-        const { _intervalId } = get();
-        if (_intervalId) clearInterval(_intervalId);
+      return {
+        seconds: 0,
+        isRunning: false,
+        isPaused: false,
 
-        const id = setInterval(() => {
-          const { isPaused } = get();
-          if (!isPaused) {
-            set((s) => ({ seconds: s.seconds + 1 }));
+        start: () => {
+          if (intervalId) clearInterval(intervalId);
+
+          intervalId = setInterval(() => {
+            const { isPaused } = get();
+            if (!isPaused) {
+              set((s: TimerState) => ({ seconds: s.seconds + 1 }));
+            }
+          }, 1000);
+
+          set(
+            { isRunning: true, isPaused: false },
+            false,
+            "Timer/start"
+          );
+        },
+
+        pause: () => {
+          set({ isPaused: true }, false, "Timer/pause");
+        },
+
+        resume: () => {
+          set({ isPaused: false }, false, "Timer/resume");
+        },
+
+        reset: () => {
+          if (intervalId) {
+            clearInterval(intervalId);
+            intervalId = null;
           }
-        }, 1000);
 
-        set(
-          {
-            isRunning: true,
-            isPaused: false,
-            _intervalId: id,
-          },
-          false,
-          "Timer/start"
-        );
-      },
+          set(
+            { seconds: 0, isRunning: false, isPaused: false },
+            false,
+            "Timer/reset"
+          );
+        },
 
-      pause: () => {
-        set({ isPaused: true }, false, "Timer/pause");
-      },
+        stop: () => {
+          if (intervalId) {
+            clearInterval(intervalId);
+            intervalId = null;
+          }
 
-      resume: () => {
-        set({ isPaused: false }, false, "Timer/resume");
-      },
+          const { seconds } = get();
 
-      reset: () => {
-        const { _intervalId } = get();
-        if (_intervalId) clearInterval(_intervalId);
+          set(
+            { isRunning: false, isPaused: false },
+            false,
+            "Timer/stop"
+          );
 
-        set(
-          {
-            seconds: 0,
-            isRunning: false,
-            isPaused: false,
-            _intervalId: null,
-          },
-          false,
-          "Timer/reset"
-        );
-      },
-
-      stop: () => {
-        const { _intervalId, seconds } = get();
-        if (_intervalId) clearInterval(_intervalId);
-
-        set(
-          {
-            isRunning: false,
-            isPaused: false,
-            _intervalId: null,
-          },
-          false,
-          "Timer/stop"
-        );
-
-        return seconds;
-      },
-    }),
-    { name: "Timer" }
+          return seconds;
+        },
+      };
+    },
+    process.env.NODE_ENV === "development" ? { name: "Timer" } : {}
   )
 );
